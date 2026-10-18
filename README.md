@@ -3,8 +3,8 @@
 <p align="center"><strong>Ясность о состоянии вашего Mac</strong><br>Метрики, диагностика, обзор хранилища и локальный мониторинг Mac.</p>
 <p align="center"><strong>Русский</strong> · <a href="README.en.md">English</a></p>
 
-[![macOS 14+](https://img.shields.io/badge/macOS-14%2B-4076c7?style=flat-square)](https://github.com/Slipcast-dev/Athena-Agent/releases/tag/v0.12.0-intermediate)
-[![Apple Silicon](https://img.shields.io/badge/Apple_Silicon-arm64-414b60?style=flat-square)](https://github.com/Slipcast-dev/Athena-Agent/releases/tag/v0.12.0-intermediate)
+[![macOS 14+](https://img.shields.io/badge/macOS-14%2B-4076c7?style=flat-square)](https://github.com/Slipcast-dev/Athena-Agent/releases/tag/v0.12.0-intermediate.1)
+[![Apple Silicon](https://img.shields.io/badge/Apple_Silicon-arm64-414b60?style=flat-square)](https://github.com/Slipcast-dev/Athena-Agent/releases/tag/v0.12.0-intermediate.1)
 [![Swift](https://img.shields.io/badge/Swift-5.9%2B-f06438?style=flat-square)](Package.swift)
 [![CI](https://github.com/Slipcast-dev/Athena-Agent/actions/workflows/ci.yml/badge.svg)](https://github.com/Slipcast-dev/Athena-Agent/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/License-Non--commercial-686b73?style=flat-square)](LICENSE)
@@ -19,7 +19,7 @@ Athena — отдельный нативный агент для macOS. Он в�
 > Внутренние executable имеют только локальную ad-hoc подпись.
 > Это проверяемый промежуточный выпуск, а не окончательный публичный релиз.
 
-[**Скачать DMG**](https://github.com/Slipcast-dev/Athena-Agent/releases/download/v0.12.0-intermediate/Athena-E10-arm64-local.dmg) · [Скачать PKG](https://github.com/Slipcast-dev/Athena-Agent/releases/download/v0.12.0-intermediate/Athena-E10-arm64-local.pkg) · [Все файлы выпуска](https://github.com/Slipcast-dev/Athena-Agent/releases/tag/v0.12.0-intermediate)
+[**Скачать DMG**](https://github.com/Slipcast-dev/Athena-Agent/releases/download/v0.12.0-intermediate.1/Athena-E10-arm64-local.dmg) · [Скачать PKG](https://github.com/Slipcast-dev/Athena-Agent/releases/download/v0.12.0-intermediate.1/Athena-E10-arm64-local.pkg) · [Все файлы выпуска](https://github.com/Slipcast-dev/Athena-Agent/releases/tag/v0.12.0-intermediate.1)
 
 ## Возможности
 

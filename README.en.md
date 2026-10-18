@@ -3,8 +3,8 @@
 <p align="center"><strong>Observe. Understand. Protect.</strong><br>Mac metrics, diagnostics, storage overview and local monitoring.</p>
 <p align="center"><a href="README.md">Русский</a> · <strong>English</strong></p>
 
-[![macOS 14+](https://img.shields.io/badge/macOS-14%2B-4076c7?style=flat-square)](https://github.com/Slipcast-dev/Athena-Agent/releases/tag/v0.12.0-intermediate)
-[![Apple Silicon](https://img.shields.io/badge/Apple_Silicon-arm64-414b60?style=flat-square)](https://github.com/Slipcast-dev/Athena-Agent/releases/tag/v0.12.0-intermediate)
+[![macOS 14+](https://img.shields.io/badge/macOS-14%2B-4076c7?style=flat-square)](https://github.com/Slipcast-dev/Athena-Agent/releases/tag/v0.12.0-intermediate.1)
+[![Apple Silicon](https://img.shields.io/badge/Apple_Silicon-arm64-414b60?style=flat-square)](https://github.com/Slipcast-dev/Athena-Agent/releases/tag/v0.12.0-intermediate.1)
 [![Swift](https://img.shields.io/badge/Swift-5.9%2B-f06438?style=flat-square)](Package.swift)
 [![CI](https://github.com/Slipcast-dev/Athena-Agent/actions/workflows/ci.yml/badge.svg)](https://github.com/Slipcast-dev/Athena-Agent/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/License-Non--commercial-686b73?style=flat-square)](LICENSE)
@@ -19,7 +19,7 @@ require the other agent repository.
 > Executables use local ad-hoc signatures only. This is an intermediate release,
 > not a production-ready public distribution.
 
-[**Download DMG**](https://github.com/Slipcast-dev/Athena-Agent/releases/download/v0.12.0-intermediate/Athena-E10-arm64-local.dmg) · [Download PKG](https://github.com/Slipcast-dev/Athena-Agent/releases/download/v0.12.0-intermediate/Athena-E10-arm64-local.pkg) · [Release assets](https://github.com/Slipcast-dev/Athena-Agent/releases/tag/v0.12.0-intermediate)
+[**Download DMG**](https://github.com/Slipcast-dev/Athena-Agent/releases/download/v0.12.0-intermediate.1/Athena-E10-arm64-local.dmg) · [Download PKG](https://github.com/Slipcast-dev/Athena-Agent/releases/download/v0.12.0-intermediate.1/Athena-E10-arm64-local.pkg) · [Release assets](https://github.com/Slipcast-dev/Athena-Agent/releases/tag/v0.12.0-intermediate.1)
 
 ## Capabilities
 
