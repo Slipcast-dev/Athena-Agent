@@ -8,13 +8,13 @@
 
 Афина — отдельный локальный агент macOS. Диагностика Mac, анализ хранилища и мониторинг.
 
-Версия **0.28.0**. Целевая macOS14+, текущий выпуск — **Apple Silicon arm64**.
+Версия **0.29.0**. Целевая macOS14+, текущий выпуск — **Apple Silicon arm64**.
 Запуск на Intel и macOS14 отдельно ещё не принят. Проект с доступными исходниками
 использует собственную некоммерческую [лицензию](LICENSE), а не MIT/OSI-лицензию.
 
-[![Version 0.28.0](https://img.shields.io/badge/Version-0.28.0-4076c7?style=flat-square)](https://github.com/Slipcast-dev/Athena-Agent/releases/tag/v0.28.0) [![CI](https://github.com/Slipcast-dev/Athena-Agent/actions/workflows/ci.yml/badge.svg)](https://github.com/Slipcast-dev/Athena-Agent/actions/workflows/ci.yml)
+[![Version 0.29.0](https://img.shields.io/badge/Version-0.29.0-4076c7?style=flat-square)](https://github.com/Slipcast-dev/Athena-Agent/releases/tag/v0.29.0) [![CI](https://github.com/Slipcast-dev/Athena-Agent/actions/workflows/ci.yml/badge.svg)](https://github.com/Slipcast-dev/Athena-Agent/actions/workflows/ci.yml)
 
-[DMG](https://github.com/Slipcast-dev/Athena-Agent/releases/download/v0.28.0/Athena-0.28.0-unsigned.dmg) · [PKG](https://github.com/Slipcast-dev/Athena-Agent/releases/download/v0.28.0/Athena-0.28.0-unsigned.pkg) · [SHA256SUMS](https://github.com/Slipcast-dev/Athena-Agent/releases/download/v0.28.0/SHA256SUMS)
+[DMG](https://github.com/Slipcast-dev/Athena-Agent/releases/download/v0.29.0/Athena-0.29.0-unsigned.dmg) · [PKG](https://github.com/Slipcast-dev/Athena-Agent/releases/download/v0.29.0/Athena-0.29.0-unsigned.pkg) · [SHA256SUMS](https://github.com/Slipcast-dev/Athena-Agent/releases/download/v0.29.0/SHA256SUMS)
 
 ## Установка
 
@@ -57,3 +57,7 @@ swift build -c release
 уязвимостях направляйте по правилам SECURITY.md.
 
 [Лицензия на русском](LICENSE) · [English license translation](LICENSE.en.md).
+
+## 0.29.0
+
+Афина восстанавливает все сохранённые события мониторов (до1000), включая записи за первой страницей; устойчивые ID исключают повторы, ошибка импорта даёт retry5s. Часовое окно баннеров сохранено.

@@ -1,7 +1,7 @@
 {
-  "version": "0.28.0",
+  "version": "0.29.0",
   "upstreamProject": "MacAssistant",
-  "upstreamCommit": "e1f1b539821496d0119f1daade36745370d83d3e",
+  "upstreamCommit": "48f7ee7b435588ce6480f32b31ae69535f61ed36",
   "sourceFiles": [
     {
       "path": ".editorconfig",
@@ -41,7 +41,7 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "c20f5aeb932fe22ad4a44535f945dacbe0f950a06f9d8f24b1ef4b6b7018dddf"
+      "sha256": "02e2342b312a0df3dcbadedbf20941c25c7aa0a8a29eca1faece3b778d934545"
     },
     {
       "path": "CODE_OF_CONDUCT.md",
@@ -497,11 +497,11 @@
     },
     {
       "path": "README.en.md",
-      "sha256": "336cd63d00298c54b0c53223f233881917954e9a30a950afef060c20e928c70e"
+      "sha256": "68d23a606992314afb605e4cd7baed786fe14d2483d05fbc059f732c2dca9113"
     },
     {
       "path": "README.md",
-      "sha256": "55e9ac80eb5094a50f3da9709dc5eed7935cc3649481721ba08fd3e3afe5437b"
+      "sha256": "f1ad17f54beb7ed84214bf9d41204eb2954aa116a51827afb0d60d66501ec8ff"
     },
     {
       "path": "SECURITY.md",
@@ -641,7 +641,7 @@
     },
     {
       "path": "Sources/MacAssistantCore/LocalRuntime/AthenaRuntimeService.swift",
-      "sha256": "a567f250ded6bde54905732409e1747fff2095c2711730774fcedad2af316d10"
+      "sha256": "f3d32955e6517d02f735a7bbdbb728d2bd60ec0037e3257ca4789a9f06269e57"
     },
     {
       "path": "Sources/MacAssistantCore/LocalRuntime/MonitorControl.swift",
@@ -729,7 +729,7 @@
     },
     {
       "path": "Sources/MacAssistantCore/Services/Monitoring/MonitorStore.swift",
-      "sha256": "257e886c5433f05d5a3c0c91c017afb62743dc38e149f48bee13f3544147f267"
+      "sha256": "c24056d3120694580a3f7b83966a06f2ce9138ebc5ba4aaf68803e11bfe1ee50"
     },
     {
       "path": "Sources/MacAssistantCore/Services/ServiceProtocols.swift",
@@ -816,6 +816,10 @@
       "sha256": "b024f3b861780853478b1c8abce38445c789cdfb63875cfad894f8d5650c8ca7"
     },
     {
+      "path": "Tests/MacAssistantCoreTests/MonitorBacklogReplayTests.swift",
+      "sha256": "489ec6de467edede11ac1b72e8f0f79b2c8f9cd1b64ebd4831a6200980393cc8"
+    },
+    {
       "path": "Tests/MacAssistantCoreTests/MonitoringTests.swift",
       "sha256": "66876329d207f73b061c35a31b5537c6f83931f498108612e1ff880ad124bc75"
     },
@@ -849,19 +853,19 @@
     },
     {
       "path": "docs/DEVELOPMENT.en.md",
-      "sha256": "9a6cb9a1d05d189e78faeca918acef4beda9a885396289c0122590fc9c841fdd"
+      "sha256": "aecdb740abd772a7b0e865f6080ab48418afa552b25fe84b30ecd5832837e703"
     },
     {
       "path": "docs/DEVELOPMENT.ru.md",
-      "sha256": "d0f557058fd3bbd50bed23759dcb8611f70b6d401014f2cf0d452c1ec9facb71"
+      "sha256": "446ee0127a9e9e1d69f3d5592391de711d48a766ab2712b5c8c53486c4444cd3"
     },
     {
       "path": "docs/INSTALL.en.md",
-      "sha256": "ee4604a68d4fca8aadc1e5cf4eb7f465b1255109a5db4678ad74ef1732310940"
+      "sha256": "7fb9dd9b5ab6770b1e61cc9c5206b9f61dbddb51287d58b17808917855a29b88"
     },
     {
       "path": "docs/INSTALL.ru.md",
-      "sha256": "c290437ceb61782c28ba0e39e2dba2c48c48d2be8ebafd9783c0994666eb4025"
+      "sha256": "aa89d0f958532e00201d4196e39cbe6da7aae779bdcb819be0be85fdd09f377c"
     },
     {
       "path": "docs/LIFECYCLE.md",
@@ -873,7 +877,7 @@
     },
     {
       "path": "docs/OPERATIONS.md",
-      "sha256": "266ce6afcb4681083852be2bded6a10431e2bafcf5d2821a41d5f70799c9fe3c"
+      "sha256": "fdccc08c790d4d9b8e8e5fa18550efa657fd720f6fd24bd11649bbca617dc3cd"
     },
     {
       "path": "docs/PERFORMANCE.md",
@@ -889,7 +893,7 @@
     },
     {
       "path": "script/build_and_run.sh",
-      "sha256": "8e05dd2de069de2dbe469365dc7964ab6d9153c39f9d1330d95f227959424bbd"
+      "sha256": "9d9f95298b58fd5bc6a45e04ad1a2b08adda81b3af56e6814677390123c416c0"
     },
     {
       "path": "script/prepare_athena_icon.swift",
@@ -903,11 +907,5 @@
       "path": "script/verify_ecosystem_dependency.py",
       "sha256": "33e022878fdb45e5e3b8d1bf3675b259e2cfe6e561855195171cee84e037e4b6"
     }
-  ],
-  "privateProfilesIncluded": false,
-  "implementationPromptsIncluded": false,
-  "internalWorkspaceDocumentationIncluded": false,
-  "vendoredCodeMatchesReviewedSource": true,
-  "publicDocumentationWrittenSeparately": true,
-  "scope": "published tracked files excluding SOURCE_MANIFEST.json"
+  ]
 }

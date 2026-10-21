@@ -1,6 +1,6 @@
-# Установка Athena0.28.0
+# Установка Athena0.29.0
 
-[Скачать проверенный промежуточный выпуск](https://github.com/Slipcast-dev/Athena-Agent/releases/tag/v0.28.0).
+[Скачать проверенный промежуточный выпуск](https://github.com/Slipcast-dev/Athena-Agent/releases/tag/v0.29.0).
 
 ## Совместимость
 

@@ -94,6 +94,13 @@ public actor MonitorStore {
         if let event { next.history.append(event); next.history = Array(next.history.suffix(1000)) }
         try persist(next)
     }
+    /// Runtime переносит весь ограниченный журнал, а не одну UI-страницу.
+    /// Снимок берётся за один actor turn: append/retention во время последующих
+    /// await не сдвигают offset и не выкидывают записи из уже взятой партии.
+    /// Новые события попадут в следующую партию; durable inbox дедуплицирует ID.
+    func historyForDelivery() -> [MonitorEvent] {
+        Array(document.history.reversed())
+    }
     public func history(_ id: UUID?, offset: Int) throws -> MonitorHistoryPage {
         guard (0...100_000).contains(offset) else { throw LocalRuntimeFailure.invalidRequest }
         if let id { _ = try entry(id) }

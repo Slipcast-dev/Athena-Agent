@@ -9,7 +9,7 @@ APP_NAME="Athena"
 PRODUCT_NAME="MacAssistant"
 BUNDLE_ID="com.macassistant.app"
 MIN_SYSTEM_VERSION="14.0"
-APP_VERSION="${ECOSYSTEM_APP_VERSION:-0.28.0}"
+APP_VERSION="${ECOSYSTEM_APP_VERSION:-0.29.0}"
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DIST_DIR="$ROOT_DIR/dist"

@@ -1,5 +1,13 @@
 # Changes / Изменения
 
+## 0.29.0
+
+Афина восстанавливает все сохранённые события мониторов (до1000), включая записи за первой страницей; устойчивые ID исключают повторы, ошибка импорта даёт retry5s. Часовое окно баннеров сохранено.
+
+Athena replays the complete retained monitor history (up to1000 events), including events beyond the first page; stable IDs prevent duplicates and failed imports retry after5s. The one-hour notification window is unchanged.
+
+Developer ID unsigned / not notarized.
+
 ## После 0.28.0 / After 0.28.0
 
 Source compatibility: SwiftPM resource layouts across Xcode versions; explicit MCP entry filename for older Swift. Released 0.28.0 installer assets remain unchanged.

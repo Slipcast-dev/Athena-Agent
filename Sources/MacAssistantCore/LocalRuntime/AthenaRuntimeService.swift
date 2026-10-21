@@ -20,19 +20,27 @@ public actor AthenaRuntimeService {
            let status = try? await work.emergencyStatus(), !status.stopped,
            let delay = await work.monitors?.nextBackgroundDelay() { values.append(delay) }
         if let delay = await automation?.notificationRetryDelay() { values.append(delay) }
+        // Ошибка импорта не должна оставить scheduler без срока, если монитор
+        // уже выключен, а непринесённое событие ещё отсутствует во входящих.
+        if monitorReplayPending { values.append(5) }
         return values.min()
     }
+    private var monitorReplayPending = false
     private var ticking = false
     public func tick() async {
         guard !ticking else { return }; ticking = true; defer { ticking = false }
         if !(await automation?.paused() ?? false) { try? await work.pollMonitors() }
         guard let automation, let monitors = work.monitors else { return }
         do {
-            let history = try await monitors.history(nil, offset: 0)
-            for event in history.items {
+            monitorReplayPending = true
+            let history = await monitors.historyForDelivery()
+            for event in history {
                 try await automation.record(id: event.id, kind: "monitor." + event.status.rawValue, capability: "monitor.history", capturedAt: event.capturedAt, significant: event.notificationEligible)
             }
-        } catch { /* Доменная история сохранена; следующий tick повторит доставку. */ }
+            // Не сохраняем high-water mark до полной партии: успешные append
+            // уже durable по ID, поэтому повтор после частичного сбоя безопасен.
+            monitorReplayPending = false
+        } catch { /* История сохранена; retry через5s даже без enabled monitors. */ }
         await automation.flushNotifications()
     }
     public func handle(role: LocalRole, clientID: LocalMCPClient? = nil, request: LocalRPCRequest) async throws -> Data {
