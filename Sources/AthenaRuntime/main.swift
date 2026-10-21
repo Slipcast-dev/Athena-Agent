@@ -17,8 +17,9 @@ import EcosystemLocalIPC
             let grants = try AthenaLocalGrants(directory: state)
             let system = SystemInformationService()
             let policy = try LocalAccessPolicy(directory: state, domain: "athena")
+            let monitors = try MonitorStore(directory: state)
             let work = try AthenaQueuedWork(queue: queue, grants: grants, system: system,
-                diagnostics: SystemDiagnosticsService(systemInformation: system), storage: StorageAnalysisService(), monitors: MonitorStore(directory: state), monitorSystem: SystemInformationService(), policy: policy)
+                diagnostics: SystemDiagnosticsService(systemInformation: system), storage: StorageAnalysisService(), monitors: monitors, monitorSystem: SystemInformationService(), policy: policy)
             let automation = try LocalAutomationService(directory: state, domain: "athena")
             let history = try LocalMCPHistory(directory: state, domain: "athena", queue: queue, policy: policy,
                 inbox: automation.inbox, authorizeTask: { id, client in
@@ -26,19 +27,22 @@ import EcosystemLocalIPC
                 })
             let service = AthenaRuntimeService(work: work, grants: grants, automation: automation, login: LocalLoginRegistration(profile: file.deletingLastPathComponent(), domain: "athena"), history: history)
             let server = try LocalRPCServer(configuration: config, identifiedHandler: { role, client, request in try await service.handle(role: role, clientID: client, request: request) })
-            let termination = LocalRuntimeTermination.install { await work.shutdown() }
+            let scheduler = AdaptiveBackgroundScheduler(tick: { await service.tick() }, delay: { await service.nextBackgroundDelay() })
+            let termination = LocalRuntimeTermination.install { await scheduler.stop(); await work.shutdown() }
             if Bundle.main.bundleURL.pathExtension == "app" { NSApplication.shared.setActivationPolicy(.accessory) }
-            let workspace = LocalWakeObserver { Task { await service.tick() } }
-            withExtendedLifetime((workspace, termination, queue, grants, work, service, server)) {
+            let workspace = LocalWakeObserver { Task { await scheduler.wake() } }
+            // Relative sleep использует monotonic clock; при смене настенных
+            // часов заново считаем due, как и при пробуждении Mac.
+            let clock = NotificationCenter.default.addObserver(forName: .NSSystemClockDidChange, object: nil, queue: nil) { _ in
+                Task { await scheduler.wake() }
+            }
+            withExtendedLifetime((workspace, clock, termination, queue, grants, work, service, server, scheduler)) {
                 server.resume()
                 Task {
                     try? await work.resume()
-                    while !Task.isCancelled {
-                        // Один таймер на владельца домена; пропущенные интервалы
-                        // не догоняются пачкой. Store проверяет due по каждой настройке.
-                        await service.tick()
-                        do { try await Task.sleep(nanoseconds: 60_000_000_000) } catch { return }
-                    }
+                    await monitors.setBackgroundWake { Task { await scheduler.wake() } }
+                    await service.setBackgroundWake { Task { await scheduler.wake() } }
+                    await scheduler.start()
                 }
                 RunLoop.main.run()
             }

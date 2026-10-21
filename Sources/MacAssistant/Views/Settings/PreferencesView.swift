@@ -42,7 +42,7 @@ struct PreferencesView: View {
                     .font(.caption).foregroundStyle(.secondary)
             }
 
-            if let runtimeClient { LocalRecoverySection(client: runtimeClient); LocalAccessSection(client: runtimeClient); LocalAutomationSection(client: runtimeClient) }
+            if let runtimeClient { LocalOperationsSection(client: runtimeClient); LocalRecoverySection(client: runtimeClient); LocalAccessSection(client: runtimeClient); LocalAutomationSection(client: runtimeClient) }
             AgentConnectionSettings(viewModel: connections)
 
             Section(SettingsBlock.privacy.rawValue) {

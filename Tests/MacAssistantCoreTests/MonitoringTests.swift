@@ -13,6 +13,25 @@ final class MonitoringTests: XCTestCase {
         let url = URL(fileURLWithPath: "/private/tmp", isDirectory: true).appendingPathComponent("athena-e5-test-" + UUID().uuidString)
         try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: [.posixPermissions: 0o700]); return url
     }
+    func testAdaptiveDeadlineUsesActualSampleTimeAndStopsWhenDisabled() async throws {
+        let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }
+        let store = try MonitorStore(directory: dir)
+        let empty = await store.nextBackgroundDelay(); XCTAssertNil(empty)
+        var rule = MonitorRule(); rule.metric = .storage; rule.intervalSeconds = 60
+        let entry = try await store.propose(rule)
+        let base = Date(timeIntervalSince1970: 1_700_000_000)
+        let plan = try await store.requestEnable(entry.id, now: base)
+        _ = try await store.approve(plan.id, fingerprint: plan.fingerprint, role: .gui, now: base)
+        let initial = await store.nextBackgroundDelay(now: base); XCTAssertEqual(initial, 5)
+        let sampled = base.addingTimeInterval(0.25)
+        try await store.record(id: entry.id, revision: plan.fingerprint, metrics: metrics(at: sampled), now: sampled)
+        let delay = await store.nextBackgroundDelay(now: base.addingTimeInterval(5))
+        XCTAssertEqual(try XCTUnwrap(delay), 55.25, accuracy: 0.001)
+        let backwards = await store.nextBackgroundDelay(now: base.addingTimeInterval(-10)); XCTAssertEqual(backwards, 5)
+        _ = try await store.disable(entry.id)
+        let disabled = await store.nextBackgroundDelay(); XCTAssertNil(disabled)
+    }
+
     func testFreshnessAndMissingCPUDoNotClaimCompletedMeasurement() throws {
         let now = Date()
         let warming = metrics(cpu: nil, at: now)
@@ -93,6 +112,57 @@ final class MonitoringTests: XCTestCase {
         let loaded = try await fresh.entry(entry.id); XCTAssertTrue(loaded.enabled); XCTAssertEqual(loaded.state.samples, [50])
         let early = await fresh.due(now: now.addingTimeInterval(59)); XCTAssertTrue(early.isEmpty)
         let due = await fresh.due(now: now.addingTimeInterval(60)); XCTAssertEqual(due.count, 1)
+    }
+    func testShortWakeCadencePreservesWindowDespiteQueuedSampleTimestampDrift() async throws {
+        let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }
+        let store = try MonitorStore(directory: dir)
+        var rule = MonitorRule(); rule.metric = .storage; rule.intervalSeconds = 60
+        rule.windowSamples = 2; rule.warning = 40; rule.critical = 45; rule.recovery = 30
+        let entry = try await store.propose(rule)
+        let base = Date(timeIntervalSince1970: 1_700_000_000)
+        let plan = try await store.requestEnable(entry.id, now: base)
+        _ = try await store.approve(plan.id, fingerprint: plan.fingerprint, role: .gui, now: base)
+
+        // Задача записывает время после измерения, позже принятия tick в очередь.
+        // При задержке0,25с следующий минутный wake приходит слишком рано:
+        // 59,75с не должны обойти минимальный interval60 ради теста/баннера.
+        let firstSample = base.addingTimeInterval(0.25)
+        try await store.record(id: entry.id, revision: plan.fingerprint,
+                               metrics: metrics(at: firstSample), now: firstSample)
+        let tooEarly = await store.due(now: base.addingTimeInterval(60))
+        XCTAssertTrue(tooEarly.isEmpty)
+
+        // Более частый wake повторяет только проверку due. Измерение на65с
+        // сохраняет окно из двух образцов, вместо пропуска целой следующей минуты.
+        let nextWake = base.addingTimeInterval(65)
+        let due = await store.due(now: nextWake)
+        XCTAssertEqual(due.map(\.id), [entry.id])
+        let secondSample = nextWake.addingTimeInterval(0.25)
+        try await store.record(id: entry.id, revision: plan.fingerprint,
+                               metrics: metrics(at: secondSample), now: secondSample)
+        let critical = try await store.entry(entry.id)
+        XCTAssertEqual(critical.state.samples.count, 2)
+        XCTAssertEqual(critical.state.status, .critical)
+        let firstHistory = try await store.history(entry.id, offset: 0)
+        XCTAssertEqual(firstHistory.items.count, 1)
+        XCTAssertEqual(firstHistory.items.first?.status, .critical)
+        XCTAssertEqual(firstHistory.items.first?.notificationEligible, true)
+
+        // Короткий wake не увеличивает частоту измерений и не порождает
+        // повторное уведомление, пока состояние critical остаётся прежним.
+        let earlyAgain = await store.due(now: base.addingTimeInterval(125))
+        XCTAssertTrue(earlyAgain.isEmpty)
+        let thirdWake = base.addingTimeInterval(130)
+        let dueAgain = await store.due(now: thirdWake)
+        XCTAssertEqual(dueAgain.map(\.id), [entry.id])
+        let thirdSample = thirdWake.addingTimeInterval(0.25)
+        try await store.record(id: entry.id, revision: plan.fingerprint,
+                               metrics: metrics(at: thirdSample), now: thirdSample)
+        let repeated = try await store.entry(entry.id)
+        XCTAssertEqual(repeated.state.samples.count, 2)
+        XCTAssertEqual(repeated.state.status, .critical)
+        let finalHistory = try await store.history(entry.id, offset: 0)
+        XCTAssertEqual(finalHistory.items.map(\.id), firstHistory.items.map(\.id))
     }
     func testUnknownApprovalFieldsAndWorkerManagementAreRejected() async throws {
         let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }

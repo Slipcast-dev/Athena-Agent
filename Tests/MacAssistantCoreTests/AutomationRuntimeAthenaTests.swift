@@ -47,6 +47,25 @@ final class AutomationRuntimeAthenaTests: XCTestCase {
                                             capturedAt: Date(), significant: true)
         return id
     }
+    func testEmergencyControlIsGUIOnlyAndBlocksNativeSubmission() async throws {
+        let f = try fixture(); defer { try? FileManager.default.removeItem(at: f.directory) }
+        for operation in ["operations.emergency_status", "operations.emergency_stop", "operations.emergency_resume"] {
+            for role in [LocalRole.mcp, .worker] {
+                await expect(.denied) { _ = try await self.call(f, operation, role: role) }
+            }
+        }
+        await expect(.invalidRequest) { _ = try await self.call(f, "operations.emergency_stop", payload: ["client": "gui"], role: .gui) }
+        let stopped = try LocalWire.decode(QueueEmergencyStatus.self, await call(f, "operations.emergency_stop", role: .gui))
+        XCTAssertTrue(stopped.stopped)
+        do {
+            _ = try await call(f, "work.submit", payload: ["capability": "system.get_info", "job": [:], "key": "stop-test"], role: .gui)
+            XCTFail("Stopped runtime accepted a task")
+        } catch { XCTAssertEqual(error as? QueueFailure, .emergencyStopped) }
+        let resumed = try LocalWire.decode(QueueEmergencyStatus.self, await call(f, "operations.emergency_resume", role: .gui))
+        XCTAssertFalse(resumed.stopped)
+        _ = try await call(f, "work.submit", payload: ["capability": "system.get_info", "job": [:], "key": "resume-test"], role: .gui)
+        await f.work.shutdown()
+    }
     func testMCPCannotConfigureAutomationAndEventsRequireSeparateCapabilities() async throws {
         let f = try fixture(); defer { try? FileManager.default.removeItem(at: f.directory) }
         for operation in ["automation.configure", "automation.request_notifications", "automation.login_configure", "automation.login_status"] {

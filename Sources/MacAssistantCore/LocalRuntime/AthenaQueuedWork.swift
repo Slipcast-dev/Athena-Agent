@@ -57,9 +57,16 @@ public actor AthenaQueuedWork {
                 return try LocalWire.encode(LocalEmpty())
             }
         }
+        // Тяжёлыми считаются операции с обходом ФС/хешированием/правилами,
+        // а не быстрые metrics/info. Метка сохраняется при обёртке авторизации.
+        let heavyCapabilities: Set<String> = ["storage.scan"]
+        operations = Dictionary(uniqueKeysWithValues: operations.map { capability, operation in
+            (capability, RegisteredQueueOperation(mutating: operation.mutating,
+                workload: heavyCapabilities.contains(capability) ? .heavy : .light, perform: operation.perform))
+        })
         if let policy {
             operations = operations.mapValues { operation in
-                RegisteredQueueOperation(mutating: operation.mutating) { data, context in
+                RegisteredQueueOperation(mutating: operation.mutating, workload: operation.workload) { data, context in
                     let job = try ContractCodec.decode(TaskRequest<AthenaJob>.self, from: data).parameters
                     guard job.requesterRole == .mcp else { return try await operation.perform(data, context) }
                     guard let ticket = job.accessTicket, ticket.client == job.requesterClientID else { throw LocalRuntimeFailure.denied }
@@ -83,6 +90,9 @@ public actor AthenaQueuedWork {
         guard let monitors, !(await monitors.due()).isEmpty else { return }
         _ = try await submit(AthenaSubmission(capability: "monitor.poll", job: AthenaJob(), key: UUID().uuidString), role: .worker)
     }
+    public func emergencyStatus() async throws -> QueueEmergencyStatus { try await executor.emergencyStatus() }
+    public func emergencyStop() async throws -> QueueEmergencyStatus { try await executor.emergencyStop() }
+    public func resumeAdmission() async throws -> QueueEmergencyStatus { try await executor.resumeAdmission() }
     public func shutdown() async { _ = try? await executor.drain() }
     public func isHealthy() async -> Bool { await executor.isHealthy() }
     public func resume() async throws { await executor.startSupervision(); try await executor.resumeQueuedTasks() }

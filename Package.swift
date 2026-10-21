@@ -9,6 +9,7 @@ let package = Package(
         .macOS(.v14)
     ],
     products: [
+        .executable(name: "AthenaMaintenance", targets: ["AthenaMaintenance"]),
         .library(name: "MacAssistantCore", targets: ["MacAssistantCore"]),
         .executable(name: "MacAssistant", targets: ["MacAssistant"]),
         // Отдельный процесс нужен Harness для безопасного протокола stdio:
@@ -24,6 +25,7 @@ let package = Package(
         .package(url: "https://github.com/jpsim/Yams.git", exact: "6.2.2")
     ],
     targets: [
+        .executableTarget(name: "AthenaMaintenance", dependencies: [.product(name: "EcosystemLocalIPC", package: "EcosystemKit")]),
         .target(name: "MacAssistantCore", dependencies: [
             .product(name: "EcosystemContracts", package: "EcosystemKit"),
             .product(name: "EcosystemLocalIPC", package: "EcosystemKit"),

@@ -12,6 +12,16 @@ public actor AthenaRuntimeService {
     private var changing = false
     private var admitting = 0
     public init(work: AthenaQueuedWork, grants: AthenaLocalGrants, automation: LocalAutomationService? = nil, login: LocalLoginRegistration? = nil, history: LocalMCPHistory? = nil) { self.work = work; self.grants = grants; self.automation = automation; self.login = login; self.history = history }
+    private var backgroundWake: (@Sendable () -> Void)?
+    public func setBackgroundWake(_ action: @escaping @Sendable () -> Void) { backgroundWake = action }
+    public func nextBackgroundDelay() async -> TimeInterval? {
+        var values: [TimeInterval] = []
+        if !(await automation?.paused() ?? false),
+           let status = try? await work.emergencyStatus(), !status.stopped,
+           let delay = await work.monitors?.nextBackgroundDelay() { values.append(delay) }
+        if let delay = await automation?.notificationRetryDelay() { values.append(delay) }
+        return values.min()
+    }
     private var ticking = false
     public func tick() async {
         guard !ticking else { return }; ticking = true; defer { ticking = false }
@@ -26,6 +36,17 @@ public actor AthenaRuntimeService {
         await automation.flushNotifications()
     }
     public func handle(role: LocalRole, clientID: LocalMCPClient? = nil, request: LocalRPCRequest) async throws -> Data {
+        if request.operation.hasPrefix("operations.emergency_") {
+            guard role == .gui else { throw LocalRuntimeFailure.denied }
+            _ = try LocalWire.decode(LocalEmpty.self, request.payload, keys: [])
+            switch request.operation {
+            case "operations.emergency_status": return try LocalWire.encode(await work.emergencyStatus())
+            case "operations.emergency_stop": return try LocalWire.encode(await work.emergencyStop())
+            case "operations.emergency_resume":
+                let result = try await work.resumeAdmission(); backgroundWake?(); return try LocalWire.encode(result)
+            default: throw LocalRuntimeFailure.denied
+            }
+        }
         if request.operation.hasPrefix("mcp.") {
             guard role == .mcp, let history else { throw LocalRuntimeFailure.denied }
             return try await history.handle(operation: request.operation, payload: request.payload, client: clientID ?? .legacy)
@@ -42,7 +63,9 @@ public actor AthenaRuntimeService {
         }
         if request.operation.hasPrefix("automation.") || request.operation.hasPrefix("events.") {
             guard let automation else { throw LocalRuntimeFailure.denied }
-            return try await LocalAutomationControl.handle(service: automation, policy: work.policy, role: role, client: clientID, request: request)
+            let result = try await LocalAutomationControl.handle(service: automation, policy: work.policy, role: role, client: clientID, request: request)
+            if ["automation.configure", "automation.request_notifications"].contains(request.operation) { backgroundWake?() }
+            return result
         }
         if request.operation.hasPrefix("access."), let policy = work.policy {
             let scope = LocalAccessScope(roots: [], capabilities: policy.capabilities)
@@ -78,6 +101,15 @@ public actor AthenaRuntimeService {
             return try JSONSerialization.data(withJSONObject: ["items": items, "nextOffset": rows.count == 100 ? offset + 100 as Any : NSNull()])
         }
         if request.operation.hasPrefix("recovery.") { return try await work.recovery.handle(role: role, request: request) }
+        // Отдельный GUI endpoint не расширяет доступ MCP или worker. Список
+        // ограничен последними 100 записями; интерфейс явно сообщает эту границу.
+        if request.operation == "operations.tasks" {
+            guard role == .gui else { throw LocalRuntimeFailure.denied }
+            _ = try LocalWire.decode(LocalEmpty.self, request.payload, keys: [])
+            return try LocalWire.encode(try await work.queue.tasks(limit: 100).map {
+                LocalOperationalTask(id: $0.id, status: $0.status)
+            })
+        }
         switch request.operation {
         case "runtime.status":
             _ = try LocalWire.decode(LocalEmpty.self, request.payload, keys: [])

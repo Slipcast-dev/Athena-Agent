@@ -2,6 +2,8 @@ import SwiftUI
 import MacAssistantCore
 
 struct DashboardView: View {
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var windowVisible = false
     @StateObject private var viewModel: DashboardViewModel
 
     init(container: AppContainer) {
@@ -35,7 +37,11 @@ struct DashboardView: View {
             .keyboardShortcut("r", modifiers: .command)
             .help("Обновить системные показатели")
         }
-        .task { await viewModel.refreshWhileVisible() }
+        .background(DashboardWindowVisibility { windowVisible = $0 })
+        .task(id: scenePhase == .active && windowVisible) {
+            guard scenePhase == .active && windowVisible else { return }
+            await viewModel.refreshWhileVisible()
+        }
     }
 }
 

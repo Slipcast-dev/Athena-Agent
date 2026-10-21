@@ -8,6 +8,17 @@ public actor MonitorStore {
     private struct Document: Codable { var version = 1; var entries: [MonitorEntry] = []; var plans: [MonitorPlan] = []; var history: [MonitorEvent] = [] }
     private let file: URL
     private var document: Document
+    private var wake: (@Sendable () -> Void)?
+    /// Сигнал вызывается после durable commit; никакого опроса документа извне.
+    public func setBackgroundWake(_ action: @escaping @Sendable () -> Void) { wake = action }
+    /// Минимум5s применяется лишь к уже просроченному замеру/занятой очереди.
+    /// Обычный интервал считается от фактического lastSampleAt, без дрейфа tick.
+    public func nextBackgroundDelay(now: Date = Date()) -> TimeInterval? {
+        let deadlines = document.entries.filter { $0.enabled && $0.approvedRevision == $0.rule.fingerprint }.map { entry in
+            entry.state.lastSampleAt.map { now < $0 ? now : $0.addingTimeInterval(Double(entry.rule.intervalSeconds)) } ?? now
+        }
+        return deadlines.min().map { max(5, $0.timeIntervalSince(now)) }
+    }
     public init(directory: URL) throws {
         file = directory.appendingPathComponent("monitors-v1.json")
         var info = stat()
@@ -31,7 +42,7 @@ public actor MonitorStore {
         let parent = open(file.deletingLastPathComponent().path, O_RDONLY | O_DIRECTORY | O_CLOEXEC)
         guard parent >= 0 else { throw LocalRuntimeFailure.operationFailed }; defer { close(parent) }
         guard fsync(parent) == 0 else { throw LocalRuntimeFailure.operationFailed }
-        document = next
+        document = next; wake?()
     }
     public func entries() -> [MonitorEntry] { document.entries }
     public func entry(_ id: UUID) throws -> MonitorEntry {

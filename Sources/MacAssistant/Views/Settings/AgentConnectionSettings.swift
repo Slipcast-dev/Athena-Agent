@@ -1,4 +1,5 @@
 import SwiftUI
+import EcosystemUI
 import MacAssistantCore
 
 /// Подтверждения остаются обязательными при изменении внешних конфигураций.
@@ -20,6 +21,7 @@ struct AgentConnectionSettings: View {
                     connectionControl(for: client)
                 }
             }
+            PlannedHermesConnection()
             if viewModel.isUpdatingConnection { ProgressView("Обновление подключения…") }
             Button("Обновить статусы", systemImage: "arrow.clockwise") {
                 Task { await viewModel.load() }

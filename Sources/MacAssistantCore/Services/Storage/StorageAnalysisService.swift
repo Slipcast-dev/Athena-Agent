@@ -8,7 +8,7 @@ public actor StorageAnalysisService: StorageAnalyzing {
 
     public init(fileManager: FileManager = .default, maximumResults: Int = 1_000) {
         self.fileManager = fileManager
-        self.maximumResults = maximumResults
+        self.maximumResults = max(0, maximumResults)
     }
 
     public func storageOverview() async throws -> StorageOverview {
@@ -38,7 +38,7 @@ public actor StorageAnalysisService: StorageAnalyzing {
             throw StorageAnalysisError.cannotEnumerateDirectory
         }
 
-        var items: [StorageItem] = []
+        var items = LargestStorageItems(capacity: maximumResults)
         while let candidate = enumerator.nextObject() as? URL {
             try Task.checkCancellation()
             let values: URLResourceValues
@@ -54,10 +54,10 @@ public actor StorageAnalysisService: StorageAnalyzing {
             }
             guard values.isRegularFile == true, let size = values.fileSize, size >= 0 else { continue }
             guard UInt64(size) >= minimumSizeBytes else { continue }
-            items.append(StorageItem(url: candidate, sizeBytes: UInt64(size), modifiedAt: values.contentModificationDate, isDirectory: false))
+            items.insert(StorageItem(url: candidate, sizeBytes: UInt64(size), modifiedAt: values.contentModificationDate, isDirectory: false))
         }
 
-        return Array(items.sorted { $0.sizeBytes > $1.sizeBytes }.prefix(maximumResults))
+        return items.sorted()
     }
 }
 
@@ -92,4 +92,36 @@ public enum StorageAnalysisError: LocalizedError, Equatable, Sendable {
         case .volumeInformationUnavailable: "Не удалось получить сведения о системном накопителе."
         }
     }
+}
+
+/// Min-heap хранит только K лучших элементов. Равные размеры упорядочены
+/// по пути: результат не зависит от порядка перечисления файловой системы.
+struct LargestStorageItems {
+    let capacity: Int
+    private(set) var heap: [StorageItem] = []
+    static func better(_ a: StorageItem, _ b: StorageItem) -> Bool {
+        a.sizeBytes == b.sizeBytes ? a.url.path < b.url.path : a.sizeBytes > b.sizeBytes
+    }
+    mutating func insert(_ item: StorageItem) {
+        guard capacity > 0 else { return }
+        if heap.count < capacity {
+            heap.append(item)
+            var i = heap.count - 1
+            while i > 0 {
+                let parent = (i - 1) / 2
+                guard Self.better(heap[parent], heap[i]) else { break }
+                heap.swapAt(parent, i); i = parent
+            }
+        } else if Self.better(item, heap[0]) {
+            heap[0] = item
+            var i = 0
+            while 2 * i + 1 < heap.count {
+                var child = 2 * i + 1
+                if child + 1 < heap.count, Self.better(heap[child], heap[child + 1]) { child += 1 }
+                guard Self.better(heap[i], heap[child]) else { break }
+                heap.swapAt(i, child); i = child
+            }
+        }
+    }
+    func sorted() -> [StorageItem] { heap.sorted(by: Self.better) }
 }

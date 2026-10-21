@@ -32,10 +32,14 @@ final class DashboardViewModel: ObservableObject {
     func refresh() async {
         state = .loading
         do {
-            async let info = systemInformation.systemInfo()
-            async let currentMetrics = systemInformation.systemMetrics()
-            systemInfo = try await info
-            metrics = try await currentMetrics
+            try Task.checkCancellation()
+            if systemInfo == nil {
+                let info = try await systemInformation.systemInfo()
+                try Task.checkCancellation(); systemInfo = info
+            }
+            let current = try await systemInformation.systemMetrics()
+            try Task.checkCancellation()
+            metrics = current
             state = .ready
         } catch is CancellationError {
             return

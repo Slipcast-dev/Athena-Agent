@@ -2,6 +2,31 @@ import XCTest
 @testable import MacAssistantCore
 
 final class StorageAnalysisTests: XCTestCase {
+    func testTopKMatchesFullSortAndNeverRetainsMoreThanK() {
+        var heap = LargestStorageItems(capacity: 17)
+        var baseline: [StorageItem] = []
+        for i in (0..<10_000).reversed() {
+            let item = StorageItem(url: URL(fileURLWithPath: "/fixture/\(i)"), sizeBytes: UInt64((i * 7919) % 4096), modifiedAt: nil, isDirectory: false)
+            baseline.append(item); heap.insert(item)
+            XCTAssertLessThanOrEqual(heap.heap.count, 17)
+        }
+        let expected = baseline.sorted { a, b in
+            a.sizeBytes == b.sizeBytes ? a.url.path < b.url.path : a.sizeBytes > b.sizeBytes
+        }.prefix(17)
+        XCTAssertEqual(heap.sorted(), Array(expected))
+        var zero = LargestStorageItems(capacity: 0)
+        zero.insert(baseline[0]); XCTAssertTrue(zero.sorted().isEmpty)
+    }
+
+    func testDirectoryResultLimitAndTieOrder() async throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: false)
+        defer { try? FileManager.default.removeItem(at: root) }
+        for name in ["c", "a", "b"] { try Data(repeating: 0, count: 20).write(to: root.appendingPathComponent(name)) }
+        let items = try await StorageAnalysisService(maximumResults: 2).scanDirectory(at: root, minimumSizeBytes: 0)
+        XCTAssertEqual(items.map(\.url.lastPathComponent), ["a", "b"])
+    }
+
     func testValidatorRejectsNonexistentDirectory() {
         XCTAssertThrowsError(try StoragePathValidator.validatedDirectory(URL(fileURLWithPath: "/private/tmp/mac-assistant-missing"))) { error in
             XCTAssertEqual(error as? StorageAnalysisError, .invalidDirectory)
