@@ -14,6 +14,10 @@ under the custom non-commercial [LICENSE](LICENSE), not an MIT-licensed project.
 
 Current sections: CPU, Network, Disk, Memory, Battery, Diagnostics and Settings. Live charts show CPU/per-core load and memory; Disk includes installed applications and their sizes.
 
+[Release 0.38.0](https://github.com/Slipcast-dev/Athena-Agent/releases/tag/v0.38.0) · [PKG](https://github.com/Slipcast-dev/Athena-Agent/releases/download/v0.38.0/Athena-0.38.0-unsigned.pkg) · [DMG](https://github.com/Slipcast-dev/Athena-Agent/releases/download/v0.38.0/Athena-0.38.0-unsigned.dmg) · [SHA-256](https://github.com/Slipcast-dev/Athena-Agent/releases/download/v0.38.0/SHA256SUMS) · [Validation and limits](docs/RELEASE.md)
+
+[Monitoring fields and refresh rates](docs/MONITORING.md).
+
 ## Installation
 
 PKG/DMG are release attachments, not Git source files. They are **unsigned by
@@ -52,8 +56,7 @@ Security reports should follow SECURITY.md; do not post personal data in issues.
 
 ## RU/EN localization / Локализация
 
-Local candidate 0.38.0; not published by this export. Полная ручная приёмка
-VoiceOver/клавиатуры и аппаратные проверки остаются открытыми.
+Pre-release 0.38.0. Full manual VoiceOver/keyboard and hardware acceptance remain open.
 Select System, Русский or English in this agent's settings. Each agent keeps its
 own language. Даты/числа следуют региону macOS. User names, paths and historical
 free text retain their original language. System Settings follows macOS language.
