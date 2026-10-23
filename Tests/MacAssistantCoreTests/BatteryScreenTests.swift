@@ -45,15 +45,23 @@ final class BatteryScreenTests: XCTestCase {
         let bitmap = try XCTUnwrap(host.bitmapImageRepForCachingDisplay(in: host.bounds))
         window.appearance?.performAsCurrentDrawingAppearance { host.cacheDisplay(in: host.bounds, to: bitmap) }
         XCTAssertGreaterThanOrEqual(bitmap.pixelsWide, Int(width))
-        var colors = Set<String>()
-        for y in stride(from: 0, to: bitmap.pixelsHigh, by: 8) {
-            for x in stride(from: 0, to: bitmap.pixelsWide, by: 8) {
+        // Число уникальных оттенков зависит от версии macOS, шрифта и
+        // сглаживания. Проверяем контрастное содержимое относительно угла
+        // однородного фона: пустой снимок имеет ноль таких точек, а подписи
+        // остаются проверяемыми и в состояниях без доступного аккумулятора.
+        let background = try XCTUnwrap(bitmap.colorAt(x: 0, y: 0)?.usingColorSpace(.sRGB))
+        var foregroundSamples = 0
+        for y in stride(from: 0, to: bitmap.pixelsHigh, by: 4) {
+            for x in stride(from: 0, to: bitmap.pixelsWide, by: 4) {
                 if let color = bitmap.colorAt(x: x, y: y)?.usingColorSpace(.sRGB) {
-                    colors.insert("\(Int(color.redComponent * 255)),\(Int(color.greenComponent * 255)),\(Int(color.blueComponent * 255))")
+                    let contrast = max(abs(color.redComponent - background.redComponent),
+                        abs(color.greenComponent - background.greenComponent),
+                        abs(color.blueComponent - background.blueComponent))
+                    if contrast > 0.15 { foregroundSamples += 1 }
                 }
             }
         }
-        XCTAssertGreaterThan(colors.count, 60, "Chart/text must actually render")
+        XCTAssertGreaterThan(foregroundSamples, 24, "Chart or status text must render against its background")
         if let path = ProcessInfo.processInfo.environment["ATHENA_BATTERY_SCREENSHOTS_DIR"] {
             let directory = URL(fileURLWithPath: path)
             try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
