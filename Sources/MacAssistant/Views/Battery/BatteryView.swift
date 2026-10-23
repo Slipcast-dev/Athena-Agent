@@ -104,8 +104,8 @@ struct BatteryContent: View {
     private var charging: String {
         if details?.fullyCharged.value == true { return l10n.text("Полностью заряжен") }
         switch model.metrics?.charging.value {
-        case true: return l10n.text("Заряжается")
-        case false: return l10n.text("Не заряжается")
+        case .some(true): return l10n.text("Заряжается")
+        case .some(false): return l10n.text("Не заряжается")
         case nil: return "—"
         }
     }

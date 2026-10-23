@@ -2,6 +2,7 @@
 
 ## 0.38.0 — 2026-10-23, pre-release
 
+- Swift compiler compatibility for memory chart expressions and optional battery state.
 - CPU and per-core live load, memory charts and per-process memory.
 - Network rates and interface configuration; disk capacity and application inventory.
 - Battery data exposed by macOS, with explicit unavailable/unsupported states.

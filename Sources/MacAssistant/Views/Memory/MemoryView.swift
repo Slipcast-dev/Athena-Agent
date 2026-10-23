@@ -110,19 +110,53 @@ struct MemoryContent: View {
                     Text(l10n.text("15 мин")).tag(ProcessorHistoryWindow.fifteenMinutes)
                 }.pickerStyle(.segmented).labelsHidden()
                     .accessibilityLabel(l10n.text("Период графика")).frame(maxWidth: 260)
-                Chart(model.chartPoints) { point in
-                    LineMark(x: .value(l10n.text("Время"), point.date), y: .value(l10n.text("Память"), point.bytes / 1_073_741_824),
+                memoryChart
+                if let selectedDate, let nearest = model.history.min(by: { abs($0.capturedAt.timeIntervalSince(selectedDate)) < abs($1.capturedAt.timeIntervalSince(selectedDate)) }) {
+                    Text(nearest.capturedAt.formatted(date: .omitted, time: .standard) + " · " +
+                         l10n.text("Занято ОЗУ") + ": " + format(nearest.values["used"].flatMap { $0 >= 0 && $0 < Double(UInt64.max) ? UInt64($0) : nil }))
+                        .font(.caption).monospacedDigit()
+                }
+            }.padding(8)
+        }
+    }
+    /// Небольшие выражения дают одинаковую типизацию на Swift из macOS CI
+    /// и на новом локальном компиляторе; шкалы и оформление остаются прежними.
+    private var chartUpperBound: Double {
+        let installed = Double(model.metrics?.totalBytes.value ?? 0) / 1_073_741_824
+        let observed = (model.chartPoints.map(\.bytes).max() ?? 0) / 1_073_741_824
+        return max(1, installed, observed)
+    }
+    private var chartTimeRange: ClosedRange<Date> {
+        let end = model.history.last?.capturedAt ?? Date()
+        return end.addingTimeInterval(-Double(model.historyWindow.rawValue))...end
+    }
+    private func seriesStroke(_ key: String) -> StrokeStyle {
+        let dash: [CGFloat]
+        switch key {
+        case "used": dash = []
+        case "compressed": dash = [6, 3]
+        default: dash = [2, 3]
+        }
+        return StrokeStyle(lineWidth: 2, dash: dash)
+    }
+    private func memoryLine(_ point: MemoryChartPoint) -> some ChartContent {
+        let gibibytes: Double = point.bytes / 1_073_741_824
+        return
+                    LineMark(x: .value(l10n.text("Время"), point.date), y: .value(l10n.text("Память"), gibibytes),
                              series: .value("segment", point.segment))
                         .foregroundStyle(by: .value(l10n.text("График"), seriesTitle(point.key)))
-                        .lineStyle(StrokeStyle(lineWidth: 2, dash: point.key == "used" ? [] : point.key == "compressed" ? [6, 3] : [2, 3]))
+                        .lineStyle(seriesStroke(point.key))
                         .interpolationMethod(.linear)
                         .accessibilityLabel(seriesTitle(point.key))
                         .accessibilityValue(format(point.bytes < Double(UInt64.max) ? UInt64(point.bytes) : nil))
+    }
+    private var memoryChart: some View {
+                Chart(model.chartPoints) { point in
+                    memoryLine(point)
                 }
                 .chartForegroundStyleScale(domain: [l10n.text("Занято ОЗУ"), l10n.text("Сжатая память"), l10n.text("Использовано swap")], range: [Color.blue, .purple, .primary])
-                .chartYScale(domain: 0...max(1, Double(model.metrics?.totalBytes.value ?? 0) / 1_073_741_824,
-                                           (model.chartPoints.map(\.bytes).max() ?? 0) / 1_073_741_824))
-                .chartXScale(domain: (model.history.last?.capturedAt ?? Date()).addingTimeInterval(-Double(model.historyWindow.rawValue))...(model.history.last?.capturedAt ?? Date()))
+                .chartYScale(domain: 0...chartUpperBound)
+                .chartXScale(domain: chartTimeRange)
                 .chartXAxisLabel(l10n.text("Время"))
                 .chartYAxisLabel(l10n.text("ГиБ"))
                 .chartXSelection(value: $selectedDate)
@@ -137,13 +171,6 @@ struct MemoryContent: View {
                     }
                 }
                 .frame(height: 210).opacity(dimmed ? 0.6 : 1)
-                if let selectedDate, let nearest = model.history.min(by: { abs($0.capturedAt.timeIntervalSince(selectedDate)) < abs($1.capturedAt.timeIntervalSince(selectedDate)) }) {
-                    Text(nearest.capturedAt.formatted(date: .omitted, time: .standard) + " · " +
-                         l10n.text("Занято ОЗУ") + ": " + format(nearest.values["used"].flatMap { $0 >= 0 && $0 < Double(UInt64.max) ? UInt64($0) : nil }))
-                        .font(.caption).monospacedDigit()
-                }
-            }.padding(8)
-        }
     }
     private func seriesTitle(_ key: String) -> String {
         switch key {
