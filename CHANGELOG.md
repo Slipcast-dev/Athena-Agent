@@ -1,5 +1,18 @@
 # Changes / Изменения
 
+## 0.37.0 — RU/EN prerelease / предварительный выпуск
+
+- Independent System/Russian/English preference per agent.
+- RU/EN UI, typed errors, new diagnostic presentation and bilingual MCP metadata.
+- Localized GUI/background bundle names and unsigned PKG welcome/readme pages.
+- Existing histories, permissions, machine schemas and replay protection retained.
+- Full manual accessibility, macOS14/Intel and installed-client acceptance remain open.
+- Preliminary release; full production acceptance remains open.
+
+Локализация: независимый выбор System/RU/EN, перевод интерфейса и встроенных
+ошибок, локализованные имена GUI/фоновой службы и страницы установщика.
+Существующие данные, разрешения и защита от повторных операций сохраняются.
+
 ## 0.29.0
 
 Афина восстанавливает все сохранённые события мониторов (до1000), включая записи за первой страницей; устойчивые ID исключают повторы, ошибка импорта даёт retry5s. Часовое окно баннеров сохранено.

@@ -1,4 +1,4 @@
-![Athena](assets/athena-banner.png)
+![Athena](docs/assets/banner.svg)
 
 <p align="center"><img src="docs/assets/athena-banner.png" width="620" alt="Athena"></p>
 
@@ -8,13 +8,9 @@
 
 Athena is an independent local macOS agent. Local Mac diagnostics, storage analysis and monitoring.
 
-Version **0.29.0** · macOS14+ target · current release **Apple Silicon arm64**.
+Version **0.37.0** · macOS14+ target · current release **Apple Silicon arm64**.
 Intel/macOS14 execution remains unverified. This is a source-available project
 under the custom non-commercial [LICENSE](LICENSE), not an MIT-licensed project.
-
-[![Version 0.29.0](https://img.shields.io/badge/Version-0.29.0-4076c7?style=flat-square)](https://github.com/Slipcast-dev/Athena-Agent/releases/tag/v0.29.0) [![CI](https://github.com/Slipcast-dev/Athena-Agent/actions/workflows/ci.yml/badge.svg)](https://github.com/Slipcast-dev/Athena-Agent/actions/workflows/ci.yml)
-
-[DMG](https://github.com/Slipcast-dev/Athena-Agent/releases/download/v0.29.0/Athena-0.29.0-unsigned.dmg) · [PKG](https://github.com/Slipcast-dev/Athena-Agent/releases/download/v0.29.0/Athena-0.29.0-unsigned.pkg) · [SHA256SUMS](https://github.com/Slipcast-dev/Athena-Agent/releases/download/v0.29.0/SHA256SUMS)
 
 ## Installation
 
@@ -51,8 +47,22 @@ No model keys or user data are bundled. See [security](SECURITY.md),
 Read [CONTRIBUTING](CONTRIBUTING.md) and the [code of conduct](CODE_OF_CONDUCT.md).
 Security reports should follow SECURITY.md; do not post personal data in issues.
 
-[Лицензия на русском](LICENSE) · [English license translation](LICENSE.en.md).
 
-## 0.29.0
+## RU/EN localization / Локализация
 
-Athena replays the complete retained monitor history (up to1000 events), including events beyond the first page; stable IDs prevent duplicates and failed imports retry after5s. The one-hour notification window is unchanged.
+**0.37.0 prerelease.** Select System, Русский or English in the agent settings.
+Each application keeps its own language. Dates and numbers follow the macOS
+region; user names, paths and historical free text retain their original values.
+System Settings uses the macOS language.
+
+Full manual VoiceOver/keyboard, macOS 14/Intel execution and installed-client
+acceptance remain open. This prerelease has not completed full acceptance.
+
+```sh
+python3 script/verify_localization_acceptance.py --athena-dir . --kit-dir Packages/EcosystemKit --require-reviewed-boundaries --output localization-acceptance.json
+ECOSYSTEM_SKIP_LSREGISTER=1 ECOSYSTEM_APP_VERSION=0.37.0 ./script/build_and_run.sh --package
+python3 script/prepare_local_release.py --run --version 0.37.0 --agent Athena --use-prepared-apps --apps-dir dist --output installers/0.37.0
+```
+
+Installer output is unsigned Developer ID and not notarized. These commands
+create and verify artifacts; they do not install applications or publish them.

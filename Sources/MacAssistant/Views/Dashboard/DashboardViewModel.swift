@@ -1,4 +1,5 @@
 import Foundation
+import EcosystemLocalization
 import MacAssistantCore
 
 /// ViewModel владеет только состоянием экрана. Получение данных остаётся в
@@ -6,8 +7,14 @@ import MacAssistantCore
 @MainActor
 final class DashboardViewModel: ObservableObject {
     @Published private(set) var state: FeaturePresentationState = .loading
+    @Published private(set) var runtimeError: RuntimeMessage?
     @Published private(set) var systemInfo: SystemInfo?
     @Published private(set) var metrics: SystemMetrics?
+
+    func presentedState(language: AgentLanguage) -> FeaturePresentationState {
+        guard let runtimeError else { return state }
+        return .error(message: AgentLocalization(language: language).runtimeMessage(runtimeError))
+    }
 
     private let systemInformation: any SystemInformationProviding
 
@@ -30,6 +37,7 @@ final class DashboardViewModel: ObservableObject {
     }
 
     func refresh() async {
+        runtimeError = nil
         state = .loading
         do {
             try Task.checkCancellation()
@@ -46,7 +54,8 @@ final class DashboardViewModel: ObservableObject {
         } catch {
             // В пользовательский интерфейс передаётся только локализованное,
             // безопасное описание: системные пути и секреты не раскрываются.
-            state = .error(message: error.localizedDescription)
+            runtimeError = .capture(error)
+                state = .error(message: error.localizedDescription)
         }
     }
 }

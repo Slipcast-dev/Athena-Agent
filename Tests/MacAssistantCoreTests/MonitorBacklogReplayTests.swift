@@ -148,4 +148,21 @@ final class MonitorBacklogReplayTests: XCTestCase {
         XCTAssertTrue(events.contains { $0.id == f.source[1].id }) // История старше1h есть в inbox.
         let sent = await f.sink.sent(); XCTAssertEqual(sent, [f.source[2].id])
     }
+    func testRuntimeLanguageDispatchPreservesBacklogAndDeniesExternalRoles() async throws {
+        let f = try fixture(); defer { try? FileManager.default.removeItem(at: f.directory) }
+        let live = try runtime(f)
+        let before = await live.monitors.historyForDelivery().map(\.id)
+        let request = LocalRPCRequest(domain: "athena", operation: "language.set", payload: Data("{\"preference\":\"en\"}".utf8))
+        for role in [LocalRole.mcp, .worker] {
+            do { _ = try await live.service.handle(role: role, request: request); XCTFail("Role bypass") }
+            catch { XCTAssertEqual(error as? LocalRuntimeFailure, .denied) }
+        }
+        let result = try await live.service.handle(role: .gui, request: request)
+        XCTAssertEqual(try LocalWire.decode(LocalLanguageStatus.self, result).preference, .en)
+        let after = await live.monitors.historyForDelivery().map(\.id); XCTAssertEqual(after, before)
+        await live.service.tick(); await live.service.tick()
+        let inbox = try await live.automation.inbox.events(now: f.source[0].capturedAt.addingTimeInterval(1))
+        XCTAssertEqual(inbox.count, f.source.count)
+        await live.work.shutdown()
+    }
 }

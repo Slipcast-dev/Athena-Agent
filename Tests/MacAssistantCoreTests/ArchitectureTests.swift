@@ -12,7 +12,7 @@ final class ArchitectureTests: XCTestCase {
             _ = try await container.services.systemInformation.systemInfo()
             XCTFail("Ожидалась явная ошибка отсутствующей реализации")
         } catch let error as ServiceError {
-            XCTAssertEqual(error, .unavailable(feature: "Системная информация"))
+            XCTAssertEqual(error, .unavailableFeature(.systemInformation))
         } catch {
             XCTFail("Получена неожиданная ошибка: \(error)")
         }

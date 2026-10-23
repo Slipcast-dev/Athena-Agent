@@ -99,7 +99,7 @@ public actor MCPConnectionService: MCPConnectionManaging {
 
     private func harnessAdapter() throws -> HarnessAdapter {
         guard let located = executableLocator() else {
-            throw ServiceError.unavailable(feature: "MCP-исполнитель Athena")
+            throw ServiceError.unavailableFeature(.athenaMCPExecutable)
         }
         let helper = located.lastPathComponent == "athena-mcp.command"
             ? located.deletingLastPathComponent().appendingPathComponent("athena-deepseekHarness-mcp.command") : located

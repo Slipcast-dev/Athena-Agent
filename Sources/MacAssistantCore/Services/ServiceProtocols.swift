@@ -55,18 +55,73 @@ public protocol MCPConnectionManaging: Sendable {
 
 public extension MCPConnectionManaging {
     /// Недоступный либо тестовый backend не получает неявное право регистрации.
-    func previewCodexConnection(connected: Bool) async throws -> CodexConnectionPlan { throw ServiceError.unavailable(feature: "Подключение субагента Codex") }
-    func applyCodexConnection(_ plan: CodexConnectionPlan) async throws -> MCPConnectionStatus { throw ServiceError.unavailable(feature: "Подключение субагента Codex") }
-    func previewHarnessConnection(connected: Bool) async throws -> HarnessConnectionPlan { throw ServiceError.unavailable(feature: "Подключение субагента Harness") }
-    func applyHarnessConnection(_ plan: HarnessConnectionPlan) async throws -> MCPConnectionStatus { throw ServiceError.unavailable(feature: "Подключение субагента Harness") }
+    func previewCodexConnection(connected: Bool) async throws -> CodexConnectionPlan { throw ServiceError.unavailableFeature(.codexSubagent) }
+    func applyCodexConnection(_ plan: CodexConnectionPlan) async throws -> MCPConnectionStatus { throw ServiceError.unavailableFeature(.codexSubagent) }
+    func previewHarnessConnection(connected: Bool) async throws -> HarnessConnectionPlan { throw ServiceError.unavailableFeature(.harnessSubagent) }
+    func applyHarnessConnection(_ plan: HarnessConnectionPlan) async throws -> MCPConnectionStatus { throw ServiceError.unavailableFeature(.harnessSubagent) }
+}
+
+/// Конечные коды встроенных причин отделены от произвольных строк интеграции.
+/// Это Swift API, не новая схема JSON: legacy callers по-прежнему могут передать
+/// String, который будет показан буквально, без поиска совпадений в каталоге.
+public enum ServiceFeature: String, CaseIterable, Sendable {
+    case systemInformation
+    case systemMetrics
+    case diagnostics
+    case storageAnalysis
+    case storageScan
+    case aiProviders
+    case aiChat
+    case agentBridge
+    case mcpConnection
+    case codexSubagent
+    case harnessSubagent
+    case athenaMCPExecutable
+    case localConsent
+
+    public var originalTitle: String {
+        switch self {
+        case .systemInformation: "Системная информация"
+        case .systemMetrics: "Системные показатели"
+        case .diagnostics: "Диагностика"
+        case .storageAnalysis: "Анализ накопителя"
+        case .storageScan: "Сканирование накопителя"
+        case .aiProviders: "ИИ-провайдеры"
+        case .aiChat: "ИИ-чат"
+        case .agentBridge: "Agent Bridge"
+        case .mcpConnection: "Подключение MCP"
+        case .codexSubagent: "Подключение субагента Codex"
+        case .harnessSubagent: "Подключение субагента Harness"
+        case .athenaMCPExecutable: "MCP-исполнитель Athena"
+        case .localConsent: "Команда требует локального согласия"
+        }
+    }
+}
+
+public enum ServiceInputReason: String, CaseIterable, Sendable {
+    case commandNotAllowed
+    case unknownCommand
+
+    public var originalDescription: String {
+        switch self {
+        case .commandNotAllowed: "Команда внешнего агента не входит в разрешённый список."
+        case .unknownCommand: "Неизвестная команда."
+        }
+    }
 }
 
 public enum ServiceError: LocalizedError, Equatable, Sendable {
     case unavailable(feature: String)
     case invalidInput(reason: String)
+    case unavailableFeature(ServiceFeature)
+    case invalidOperation(ServiceInputReason)
 
     public var errorDescription: String? {
         switch self {
+        case let .unavailableFeature(feature):
+            return "Функция «\(feature.originalTitle)» пока недоступна."
+        case let .invalidOperation(reason):
+            return "Некорректные входные данные: \(reason.originalDescription)"
         case let .unavailable(feature):
             return "Функция «\(feature)» пока недоступна."
         case let .invalidInput(reason):

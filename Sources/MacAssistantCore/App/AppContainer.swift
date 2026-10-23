@@ -81,34 +81,34 @@ public struct ServiceDependencies: Sendable {
 }
 
 private struct UnavailableSystemService: SystemInformationProviding {
-    func systemInfo() async throws -> SystemInfo { throw ServiceError.unavailable(feature: "Системная информация") }
-    func systemMetrics() async throws -> SystemMetrics { throw ServiceError.unavailable(feature: "Системные показатели") }
+    func systemInfo() async throws -> SystemInfo { throw ServiceError.unavailableFeature(.systemInformation) }
+    func systemMetrics() async throws -> SystemMetrics { throw ServiceError.unavailableFeature(.systemMetrics) }
 }
 
 private struct UnavailableDiagnosticsService: SystemDiagnosing {
-    func runDiagnostics() async throws -> DiagnosticReport { throw ServiceError.unavailable(feature: "Диагностика") }
+    func runDiagnostics() async throws -> DiagnosticReport { throw ServiceError.unavailableFeature(.diagnostics) }
 }
 
 private struct UnavailableStorageService: StorageAnalyzing {
-    func storageOverview() async throws -> StorageOverview { throw ServiceError.unavailable(feature: "Анализ накопителя") }
-    func scanDirectory(at _: URL, minimumSizeBytes _: UInt64) async throws -> [StorageItem] { throw ServiceError.unavailable(feature: "Сканирование накопителя") }
+    func storageOverview() async throws -> StorageOverview { throw ServiceError.unavailableFeature(.storageAnalysis) }
+    func scanDirectory(at _: URL, minimumSizeBytes _: UInt64) async throws -> [StorageItem] { throw ServiceError.unavailableFeature(.storageScan) }
 }
 
 private struct UnavailableAIService: AIProviding {
-    func availableModels(for _: AIProviderProfile) async throws -> [AIModel] { throw ServiceError.unavailable(feature: "ИИ-провайдеры") }
-    func send(messages _: [ChatMessage], using _: AIProviderProfile, modelID _: String) async throws -> ChatMessage { throw ServiceError.unavailable(feature: "ИИ-чат") }
+    func availableModels(for _: AIProviderProfile) async throws -> [AIModel] { throw ServiceError.unavailableFeature(.aiProviders) }
+    func send(messages _: [ChatMessage], using _: AIProviderProfile, modelID _: String) async throws -> ChatMessage { throw ServiceError.unavailableFeature(.aiChat) }
 }
 
 private struct UnavailableAIProfileManager: AIProfileManaging {
     func profiles() async -> [AIProviderProfile] { [] }
-    func save(profile _: AIProviderProfile, apiKey _: String?) async throws { throw ServiceError.unavailable(feature: "ИИ-провайдеры") }
-    func delete(profileID _: UUID) async throws { throw ServiceError.unavailable(feature: "ИИ-провайдеры") }
+    func save(profile _: AIProviderProfile, apiKey _: String?) async throws { throw ServiceError.unavailableFeature(.aiProviders) }
+    func delete(profileID _: UUID) async throws { throw ServiceError.unavailableFeature(.aiProviders) }
 }
 
 private actor UnavailableAgentBridge: AgentBridging {
     func availableCommands() async -> [AgentCommand] { [] }
     func execute(command _: AgentCommandRequest) async throws -> AgentCommandResult {
-        throw ServiceError.unavailable(feature: "Agent Bridge")
+        throw ServiceError.unavailableFeature(.agentBridge)
     }
     func activeTasks() async -> [AgentTask] { [] }
     func cancelTask(id _: UUID) async {}
@@ -116,6 +116,6 @@ private actor UnavailableAgentBridge: AgentBridging {
 
 private struct UnavailableMCPConnectionService: MCPConnectionManaging {
     func status(for _: MCPClient) async -> MCPConnectionStatus { .unavailable(reason: "Подключение MCP недоступно.") }
-    func connect(_: MCPClient) async throws -> MCPConnectionStatus { throw ServiceError.unavailable(feature: "Подключение MCP") }
-    func disconnect(_: MCPClient) async throws -> MCPConnectionStatus { throw ServiceError.unavailable(feature: "Подключение MCP") }
+    func connect(_: MCPClient) async throws -> MCPConnectionStatus { throw ServiceError.unavailableFeature(.mcpConnection) }
+    func disconnect(_: MCPClient) async throws -> MCPConnectionStatus { throw ServiceError.unavailableFeature(.mcpConnection) }
 }

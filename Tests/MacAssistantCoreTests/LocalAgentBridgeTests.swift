@@ -33,7 +33,7 @@ final class LocalAgentBridgeTests: XCTestCase {
             _ = try await bridge.execute(command: AgentCommandRequest(commandID: "shell.execute"))
             XCTFail("Команда shell не должна быть доступна внешнему агенту")
         } catch let error as ServiceError {
-            guard case .invalidInput = error else {
+            guard case .invalidOperation(.commandNotAllowed) = error else {
                 return XCTFail("Ожидалась ошибка allowlist, получено: \(error)")
             }
         } catch {

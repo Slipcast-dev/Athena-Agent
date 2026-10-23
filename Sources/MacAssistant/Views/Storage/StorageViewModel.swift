@@ -1,12 +1,19 @@
 import AppKit
 import Foundation
+import EcosystemLocalization
 import MacAssistantCore
 
 @MainActor
 final class StorageViewModel: ObservableObject {
     @Published private(set) var state: FeaturePresentationState = .ready
+    @Published private(set) var runtimeError: RuntimeMessage?
     @Published private(set) var items: [StorageItem] = []
     @Published private(set) var selectedDirectory: URL?
+    func presentedState(language: AgentLanguage) -> FeaturePresentationState {
+        guard let runtimeError else { return state }
+        return .error(message: AgentLocalization(language: language).runtimeMessage(runtimeError))
+    }
+
     private let storage: any StorageAnalyzing
     private var scanID = UUID()
     private var scanTask: Task<Void, Never>?
@@ -14,12 +21,13 @@ final class StorageViewModel: ObservableObject {
     init(storage: any StorageAnalyzing) { self.storage = storage }
     deinit { scanTask?.cancel() }
 
-    func chooseAndScanDirectory() {
+    func chooseAndScanDirectory(language: AgentLanguage) {
+        let l10n = AthenaLocalization(language: language)
         let panel = NSOpenPanel()
         panel.canChooseDirectories = true
         panel.canChooseFiles = false
         panel.allowsMultipleSelection = false
-        panel.prompt = "Анализировать"
+        panel.prompt = l10n.text("Анализировать")
         guard panel.runModal() == .OK, let url = panel.url else { return }
         startScan(directory: url)
     }
@@ -28,6 +36,7 @@ final class StorageViewModel: ObservableObject {
         scanTask?.cancel()
         let id = UUID(); scanID = id
         selectedDirectory = directory
+        runtimeError = nil
         state = .loading
         scanTask = Task { [weak self] in
             guard let self else { return }
@@ -41,6 +50,7 @@ final class StorageViewModel: ObservableObject {
                 state = .ready
             } catch {
                 guard scanID == id else { return }
+                runtimeError = .capture(error)
                 state = .error(message: error.localizedDescription)
             }
         }

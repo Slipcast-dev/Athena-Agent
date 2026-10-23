@@ -1,5 +1,6 @@
 import CoreFoundation
 import Foundation
+import EcosystemLocalization
 import EcosystemLocalIPC
 import EcosystemRuntimeSupport
 
@@ -37,7 +38,7 @@ public enum AthenaMCP {
                 else { properties[key] = ["type": "string", "minLength": 1, "maxLength": 128] }
             }
             let required = allowed(name).subtracting(["offset", "idempotencyKey"]).subtracting(name == "monitor.history" ? ["monitorId"] : [])
-            return ["name": name, "description": "Локальная операция Athena: " + name, "inputSchema": ["type": "object", "properties": properties, "required": required.sorted(), "additionalProperties": false]]
+            return ["name": name, "description": RuntimeLocalization.bilingual("Локальная операция Athena: %@", name), "inputSchema": ["type": "object", "properties": properties, "required": required.sorted(), "additionalProperties": false]]
         } + LocalAccessMCP.tools + LocalInboxMCP.tools
     }
     public static func call(_ name: String, args: [String: Any], client: LocalRPCClient, context: MCPCallContext? = nil) async throws -> [String: Any] {
@@ -51,7 +52,7 @@ public enum AthenaMCP {
             let id: LocalTaskID = try await client.call("work.submit", AthenaSubmission(capability: capability, job: AthenaJob(), key: key))
             if name == "diagnostics.start" { return ["taskId": id.id.uuidString, "status": "accepted"] }
             let data = try await client.waitForData(id.id, cancelOnCancellation: false, onProgress: { progress in
-                if let progress { await context?.progress(Double(progress.processed.value), progress.total.map { Double($0.value) }, "Выполнение") }
+                if let progress { await context?.progress(Double(progress.processed.value), progress.total.map { Double($0.value) }, AgentLocalization(language: RuntimeLocalization.clientLanguage).runtimeText("Выполнение")) }
             })
             var result = try AthenaPublicResult.result(capability: capability, data: data); result["taskId"] = id.id.uuidString
             return result

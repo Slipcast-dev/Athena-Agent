@@ -9,10 +9,10 @@ APP_NAME="Athena"
 PRODUCT_NAME="MacAssistant"
 BUNDLE_ID="com.macassistant.app"
 MIN_SYSTEM_VERSION="14.0"
-APP_VERSION="${ECOSYSTEM_APP_VERSION:-0.29.0}"
+APP_VERSION="${ECOSYSTEM_APP_VERSION:-0.37.0}"
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-DIST_DIR="$ROOT_DIR/dist"
+DIST_DIR="${ECOSYSTEM_APP_OUTPUT_DIR:-$ROOT_DIR/dist}"
 INSTALLERS_DIR="$ROOT_DIR/installers"
 # Finder не должен наблюдать пустой/недособранный .app: иначе он запоминает
 # стандартную иконку до перезапуска. Публикуем только полностью готовый bundle.
@@ -44,6 +44,26 @@ swift build -c "$BUILD_CONFIGURATION"
 BUILD_BINARY="$(swift build -c "$BUILD_CONFIGURATION" --show-bin-path)/$PRODUCT_NAME"
 BUILD_MCP_BINARY="$(swift build -c "$BUILD_CONFIGURATION" --show-bin-path)/MacAssistantMCP"
 BUILD_PRODUCTS_DIR="$(dirname "$BUILD_BINARY")"
+# Проверяем ресурсы до codesign: прежний wildcard copy не доказывает, что
+# SwiftPM вообще создал новый bundle для обоих языков.
+LOCALIZATION_RESOURCES="$BUILD_PRODUCTS_DIR/EcosystemKit_EcosystemLocalization.bundle"
+if [[ -d "$LOCALIZATION_RESOURCES/Contents/Resources" ]]; then
+  LOCALIZATION_RESOURCES="$LOCALIZATION_RESOURCES/Contents/Resources"
+fi
+for locale in ru en; do
+  for table in Localizable.strings Localizable.stringsdict Shared.strings Runtime.strings; do
+    test -f "$LOCALIZATION_RESOURCES/$locale.lproj/$table"
+  done
+done
+
+# Собственный каталог GUI обязателен независимо от общих ресурсов Kit.
+ATHENA_RESOURCES="$BUILD_PRODUCTS_DIR/MacAssistant_MacAssistant.bundle"
+if [[ -d "$ATHENA_RESOURCES/Contents/Resources" ]]; then
+  ATHENA_RESOURCES="$ATHENA_RESOURCES/Contents/Resources"
+fi
+for locale in ru en; do
+  test -f "$ATHENA_RESOURCES/$locale.lproj/Athena.strings"
+done
 
 mkdir -p "$APP_MACOS"
 mkdir -p "$APP_CONTENTS/Resources"
@@ -90,6 +110,10 @@ cat >"$INFO_PLIST" <<PLIST
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+  <key>CFBundleDevelopmentRegion</key>
+  <string>en</string>
+  <key>CFBundleLocalizations</key>
+  <array><string>ru</string><string>en</string></array>
   <key>CFBundleExecutable</key>
   <string>$PRODUCT_NAME</string>
   <key>CFBundleIdentifier</key>
@@ -134,12 +158,21 @@ from pathlib import Path
 Path(sys.argv[1]).write_bytes(plistlib.dumps({
     'CFBundlePackageType': 'APPL', 'CFBundleExecutable': 'AthenaRuntime',
     'CFBundleIdentifier': 'com.macassistant.app.background',
-    'CFBundleName': 'Athena Background', 'CFBundleVersion': sys.argv[2],
+    'CFBundleName': 'Athena Background', 'CFBundleDisplayName': 'Athena Background',
+    'CFBundleDevelopmentRegion': 'en', 'CFBundleLocalizations': ['ru', 'en'],
+    'CFBundleVersion': sys.argv[2],
     'CFBundleShortVersionString': sys.argv[2],
     'CFBundleIconFile': 'Athena.icns',
     'LSMinimumSystemVersion': '14.0', 'LSUIElement': True,
     'NSPrincipalClass': 'NSApplication'}))
 BACKGROUND_PLIST
+# Имена GUI и отправителя уведомлений читаются macOS из разных bundles.
+# Копируем source metadata явно в оба .app до подписи; никаких privacy keys.
+for locale in ru en; do
+  mkdir -p "$APP_CONTENTS/Resources/$locale.lproj" "$BACKGROUND/Contents/Resources/$locale.lproj"
+  cp "$ROOT_DIR/distribution/Localization/GUI/$locale.lproj/InfoPlist.strings" "$APP_CONTENTS/Resources/$locale.lproj/InfoPlist.strings"
+  cp "$ROOT_DIR/distribution/Localization/Background/$locale.lproj/InfoPlist.strings" "$BACKGROUND/Contents/Resources/$locale.lproj/InfoPlist.strings"
+done
 # Вложенный код подписывается до внешнего seal. --deep при подписи скрывал бы
 # неполный список helpers; здесь каждый элемент назван явно.
 /usr/bin/codesign --force --sign - "$MCP_BINARY"

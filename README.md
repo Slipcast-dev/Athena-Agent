@@ -1,4 +1,4 @@
-![Athena](assets/athena-banner.png)
+![Athena](docs/assets/banner.svg)
 
 <p align="center"><img src="docs/assets/athena-banner.png" width="620" alt="Athena"></p>
 
@@ -8,13 +8,9 @@
 
 Афина — отдельный локальный агент macOS. Диагностика Mac, анализ хранилища и мониторинг.
 
-Версия **0.29.0**. Целевая macOS14+, текущий выпуск — **Apple Silicon arm64**.
+Версия **0.37.0**. Целевая macOS14+, текущий выпуск — **Apple Silicon arm64**.
 Запуск на Intel и macOS14 отдельно ещё не принят. Проект с доступными исходниками
 использует собственную некоммерческую [лицензию](LICENSE), а не MIT/OSI-лицензию.
-
-[![Version 0.29.0](https://img.shields.io/badge/Version-0.29.0-4076c7?style=flat-square)](https://github.com/Slipcast-dev/Athena-Agent/releases/tag/v0.29.0) [![CI](https://github.com/Slipcast-dev/Athena-Agent/actions/workflows/ci.yml/badge.svg)](https://github.com/Slipcast-dev/Athena-Agent/actions/workflows/ci.yml)
-
-[DMG](https://github.com/Slipcast-dev/Athena-Agent/releases/download/v0.29.0/Athena-0.29.0-unsigned.dmg) · [PKG](https://github.com/Slipcast-dev/Athena-Agent/releases/download/v0.29.0/Athena-0.29.0-unsigned.pkg) · [SHA256SUMS](https://github.com/Slipcast-dev/Athena-Agent/releases/download/v0.29.0/SHA256SUMS)
 
 ## Установка
 
@@ -56,8 +52,22 @@ swift build -c release
 и лицензию. Не публикуйте в issue личные файлы, профили и секреты. Сообщения об
 уязвимостях направляйте по правилам SECURITY.md.
 
-[Лицензия на русском](LICENSE) · [English license translation](LICENSE.en.md).
 
-## 0.29.0
+## RU/EN localization / Локализация
 
-Афина восстанавливает все сохранённые события мониторов (до1000), включая записи за первой страницей; устойчивые ID исключают повторы, ошибка импорта даёт retry5s. Часовое окно баннеров сохранено.
+Предварительный выпуск **0.37.0**. Выберите «Системный», «Русский» или «English»
+в настройках агента. Язык каждого приложения задаётся отдельно. Числа и даты
+следуют региону macOS; пользовательские имена, пути и свободный текст истории
+сохраняются. Системные настройки используют язык macOS.
+
+Полная ручная проверка VoiceOver/клавиатуры, macOS 14/Intel и установленных
+клиентов остаётся открытой. Этот предварительный выпуск не прошёл полную приёмку.
+
+```sh
+python3 script/verify_localization_acceptance.py --athena-dir . --kit-dir Packages/EcosystemKit --require-reviewed-boundaries --output localization-acceptance.json
+ECOSYSTEM_SKIP_LSREGISTER=1 ECOSYSTEM_APP_VERSION=0.37.0 ./script/build_and_run.sh --package
+python3 script/prepare_local_release.py --run --version 0.37.0 --agent Athena --use-prepared-apps --apps-dir dist --output installers/0.37.0
+```
+
+Installer output is unsigned Developer ID and not notarized. These commands
+create and verify artifacts; they do not install applications or publish them.

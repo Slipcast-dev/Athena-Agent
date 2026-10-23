@@ -4,9 +4,11 @@ import Foundation
 import MacAssistantCore
 import EcosystemRuntimeSupport
 import EcosystemLocalIPC
+import EcosystemLocalization
 
 @main struct AthenaRuntime {
     static func main() {
+        if LocalizationProbe.runIfRequested() { exit(0) }
         do {
             if try LocalRuntimeCLI.clientIfRequested(domain: "athena") { return }
             umask(0o077)

@@ -160,14 +160,14 @@ public actor SystemInformationService: SystemInformationProviding {
             .volumeAvailableCapacityKey
         ])
         guard let total = values.volumeTotalCapacity, total > 0 else {
-            throw SystemServiceError.missingValue(name: "общая ёмкость накопителя")
+            throw SystemServiceError.missingSystemValue(.totalStorageCapacity)
         }
         // Foundation использует Int64 для preferred-значения APFS и Int для
         // устаревшего fallback. Приводим их до объединения, не теряя разрядность.
         let legacyAvailable = values.volumeAvailableCapacity.map(Int64.init)
         guard let available = values.volumeAvailableCapacityForImportantUsage
             ?? legacyAvailable else {
-            throw SystemServiceError.missingValue(name: "доступное место на накопителе")
+            throw SystemServiceError.missingSystemValue(.availableStorageSpace)
         }
 
         return (UInt64(total), UInt64(max(available, 0)))
@@ -199,15 +199,29 @@ private func sysctlString(named name: String) throws -> String {
     return value
 }
 
+/// Имена встроенных системных показателей имеют конечные коды; внешний name
+/// legacy API не переводится по тексту и остаётся техническим literal значением.
+public enum SystemValue: String, CaseIterable, Sendable {
+    case totalStorageCapacity, availableStorageSpace
+    public var originalName: String {
+        switch self {
+        case .totalStorageCapacity: "общая ёмкость накопителя"
+        case .availableStorageSpace: "доступное место на накопителе"
+        }
+    }
+}
+
 public enum SystemServiceError: LocalizedError, Equatable, Sendable {
     case sysctlFailed(name: String, code: Int32)
     case machCallFailed(code: kern_return_t)
     case missingValue(name: String)
+    case missingSystemValue(SystemValue)
 
     public var errorDescription: String? {
         switch self {
         case let .sysctlFailed(name, _): "Не удалось получить системное значение «\(name)»."
         case .machCallFailed: "Не удалось получить системную статистику macOS."
+        case let .missingSystemValue(value): "Система не предоставила значение: \(value.originalName)."
         case let .missingValue(name): "Система не предоставила значение: \(name)."
         }
     }

@@ -1,4 +1,5 @@
 import Foundation
+import EcosystemLocalization
 import EcosystemLocalIPC
 
 /// Безопасный исполнитель разрешённых MCP-команд.
@@ -12,25 +13,25 @@ public actor LocalAgentBridge: AgentBridging {
             id: "system.get_info",
             title: "Сведения о Mac",
             permissionLevel: .readOnly,
-            description: "Модель, версия macOS, архитектура и число ядер без серийного номера."
+            description: RuntimeLocalization.bilingual("Модель, версия macOS, архитектура и число ядер без серийного номера.")
         ),
         AgentCommand(
             id: "system.get_metrics",
             title: "Показатели системы",
             permissionLevel: .readOnly,
-            description: "Текущие CPU, память и свободное место без истории процессов."
+            description: RuntimeLocalization.bilingual("Текущие CPU, память и свободное место без истории процессов.")
         ),
         AgentCommand(
             id: "diagnostics.run",
             title: "Локальная диагностика",
             permissionLevel: .readOnly,
-            description: "Структурированный отчёт и безопасные рекомендации, созданные локально."
+            description: RuntimeLocalization.bilingual("Структурированный отчёт и безопасные рекомендации, созданные локально.")
         ),
         AgentCommand(
             id: "storage.get_overview",
             title: "Сводка накопителя",
             permissionLevel: .readOnly,
-            description: "Общий и доступный объём системного накопителя без путей и списка файлов."
+            description: RuntimeLocalization.bilingual("Общий и доступный объём системного накопителя без путей и списка файлов.")
         )
     ]
 
@@ -59,10 +60,10 @@ public actor LocalAgentBridge: AgentBridging {
 
     public func execute(command request: AgentCommandRequest) async throws -> AgentCommandResult {
         guard let command = Self.commands.first(where: { $0.id == request.commandID }) else {
-            throw ServiceError.invalidInput(reason: "Команда внешнего агента не входит в разрешённый список.")
+            throw ServiceError.invalidOperation(.commandNotAllowed)
         }
         guard command.permissionLevel == .readOnly else {
-            throw ServiceError.unavailable(feature: "Команда требует локального согласия")
+            throw ServiceError.unavailableFeature(.localConsent)
         }
 
         if let remote {
@@ -91,67 +92,73 @@ public actor LocalAgentBridge: AgentBridging {
     }
 
     private func result(for commandID: String) async throws -> AgentCommandResult {
+        // Локализуем только новый ответ; сохранённые результаты и UUID не меняются.
+        let l10n = AgentLocalization(language: RuntimeLocalization.clientLanguage)
         switch commandID {
         case "system.get_info":
             let info = try await systemInformation.systemInfo()
             return AgentCommandResult(
                 commandID: commandID,
-                text: "Mac: \(info.modelName); macOS: \(info.operatingSystemVersion); архитектура: \(info.architecture); ядер: \(info.physicalCPUCoreCount)/\(info.logicalCPUCoreCount)."
+                text: l10n.runtimeText("Mac: %@; macOS: %@; архитектура: %@; ядер: %@/%@.", info.modelName, info.operatingSystemVersion, info.architecture, String(info.physicalCPUCoreCount), String(info.logicalCPUCoreCount))
             )
         case "system.get_metrics":
             let metrics = try await systemInformation.systemMetrics()
-            let cpu = metrics.cpuUsagePercent.map { String(format: "%.1f%%", $0) } ?? "подготавливается"
+            let cpu = metrics.cpuUsagePercent.map { String(format: "%.1f%%", $0) } ?? l10n.runtimeText("подготавливается")
             return AgentCommandResult(
                 commandID: commandID,
-                text: "CPU: \(cpu); память: \(metrics.usedMemoryBytes)/\(metrics.totalMemoryBytes) байт; доступно на накопителе: \(metrics.availableStorageBytes) байт."
+                text: l10n.runtimeText("CPU: %@; память: %@/%@ байт; доступно на накопителе: %@ байт.", cpu, String(metrics.usedMemoryBytes), String(metrics.totalMemoryBytes), String(metrics.availableStorageBytes))
             )
         case "diagnostics.run":
             let report = try await diagnostics.runDiagnostics()
-            let findings = report.findings.map(\.title).joined(separator: "; ")
+            // Код новых findings выбирает перевод; legacy/unknown остаются исходными.
+            let findings = report.findings.map { $0.localized(using: l10n).title }.joined(separator: "; ")
             return AgentCommandResult(
                 commandID: commandID,
-                text: "Диагностика: \(report.status.rawValue). Находки: \(findings.isEmpty ? "нет" : findings)."
+                text: l10n.runtimeText("Диагностика: %@. Находки: %@.", report.status.rawValue, findings.isEmpty ? l10n.runtimeText("нет") : findings)
             )
         case "storage.get_overview":
             let overview = try await storage.storageOverview()
             return AgentCommandResult(
                 commandID: commandID,
-                text: "Накопитель: всего \(overview.totalBytes) байт, доступно \(overview.availableBytes) байт."
+                text: l10n.runtimeText("Накопитель: всего %@ байт, доступно %@ байт.", String(overview.totalBytes), String(overview.availableBytes))
             )
         default:
-            throw ServiceError.invalidInput(reason: "Неизвестная команда.")
+            throw ServiceError.invalidOperation(.unknownCommand)
         }
     }
     private static func remoteResult(for commandID: String, data: Data) throws -> AgentCommandResult {
+        // Локализуем только новый ответ; сохранённые результаты и UUID не меняются.
+        let l10n = AgentLocalization(language: RuntimeLocalization.clientLanguage)
         switch commandID {
         case "system.get_info":
             let info = try LocalWire.decode(SystemInfo.self, data)
             return AgentCommandResult(
                 commandID: commandID,
-                text: "Mac: \(info.modelName); macOS: \(info.operatingSystemVersion); архитектура: \(info.architecture); ядер: \(info.physicalCPUCoreCount)/\(info.logicalCPUCoreCount)."
+                text: l10n.runtimeText("Mac: %@; macOS: %@; архитектура: %@; ядер: %@/%@.", info.modelName, info.operatingSystemVersion, info.architecture, String(info.physicalCPUCoreCount), String(info.logicalCPUCoreCount))
             )
         case "system.get_metrics":
             let metrics = try LocalWire.decode(SystemMetrics.self, data)
-            let cpu = metrics.cpuUsagePercent.map { String(format: "%.1f%%", $0) } ?? "подготавливается"
+            let cpu = metrics.cpuUsagePercent.map { String(format: "%.1f%%", $0) } ?? l10n.runtimeText("подготавливается")
             return AgentCommandResult(
                 commandID: commandID,
-                text: "CPU: \(cpu); память: \(metrics.usedMemoryBytes)/\(metrics.totalMemoryBytes) байт; доступно на накопителе: \(metrics.availableStorageBytes) байт."
+                text: l10n.runtimeText("CPU: %@; память: %@/%@ байт; доступно на накопителе: %@ байт.", cpu, String(metrics.usedMemoryBytes), String(metrics.totalMemoryBytes), String(metrics.availableStorageBytes))
             )
         case "diagnostics.run":
             let report = try LocalWire.decode(DiagnosticReport.self, data)
-            let findings = report.findings.map(\.title).joined(separator: "; ")
+            // Код новых findings выбирает перевод; legacy/unknown остаются исходными.
+            let findings = report.findings.map { $0.localized(using: l10n).title }.joined(separator: "; ")
             return AgentCommandResult(
                 commandID: commandID,
-                text: "Диагностика: \(report.status.rawValue). Находки: \(findings.isEmpty ? "нет" : findings)."
+                text: l10n.runtimeText("Диагностика: %@. Находки: %@.", report.status.rawValue, findings.isEmpty ? l10n.runtimeText("нет") : findings)
             )
         case "storage.get_overview":
             let overview = try LocalWire.decode(StorageOverview.self, data)
             return AgentCommandResult(
                 commandID: commandID,
-                text: "Накопитель: всего \(overview.totalBytes) байт, доступно \(overview.availableBytes) байт."
+                text: l10n.runtimeText("Накопитель: всего %@ байт, доступно %@ байт.", String(overview.totalBytes), String(overview.availableBytes))
             )
         default:
-            throw ServiceError.invalidInput(reason: "Неизвестная команда.")
+            throw ServiceError.invalidOperation(.unknownCommand)
         }
     }
 }

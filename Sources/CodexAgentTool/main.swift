@@ -1,5 +1,6 @@
 import Darwin
 import Foundation
+import EcosystemLocalization
 import EcosystemClientAdapters
 
 /// Явный локальный инструмент: preview никогда не регистрирует соединение.
@@ -7,10 +8,12 @@ import EcosystemClientAdapters
 @main
 struct CodexAgentTool {
     static func main() async {
+        if LocalizationProbe.runIfRequested() { return }
         umask(0o077)
         do {
             let arguments = Array(CommandLine.arguments.dropFirst())
             if arguments == ["--help"] {
+                print(AgentLocalization(language: RuntimeLocalization.clientLanguage).runtimeText("cli.connectionHelp"))
                 print("CodexAgentTool --action preview-connect|preview-disconnect|apply|recover|status --domain ares|athena --config-directory PATH --helper PATH [--codex PATH] [--plan-file PATH]")
                 return
             }
@@ -50,10 +53,10 @@ struct CodexAgentTool {
             default: throw CodexAdapterError.invalidConfiguration
             }
         } catch let error as CodexAdapterError {
-            fputs((error.errorDescription ?? "Ошибка подключения Codex.") + "\n", stderr); exit(64)
+            fputs(AgentLocalization(language: RuntimeLocalization.clientLanguage).runtimeError(error) + "\n", stderr); exit(64)
         } catch {
             // Не экспортируем ошибки декодирования либо чужое содержимое файлов.
-            fputs("Не удалось выполнить локальную операцию подключения Codex.\n", stderr); exit(65)
+            fputs(AgentLocalization(language: RuntimeLocalization.clientLanguage).runtimeText("Не удалось выполнить локальную операцию подключения Codex.") + "\n", stderr); exit(65)
         }
     }
     private static func encode<T: Encodable>(_ value: T) throws -> Data {

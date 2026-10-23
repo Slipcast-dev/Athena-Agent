@@ -1,5 +1,6 @@
 import SwiftUI
 import EcosystemLocalIPC
+import EcosystemLocalization
 import EcosystemUI
 import MacAssistantCore
 
@@ -9,19 +10,25 @@ struct MacAssistantApp: App {
     /// Контейнер создаётся один раз на жизненный цикл приложения: экраны в
     /// последующих блоках будут получать зависимости через него, а не создавать сервисы сами.
     private let container: AppContainer?
-    private let startupError: String?
+    @StateObject private var language: LocalLanguageModel
+    private let startupError: RuntimeMessage?
     /// Значение хранится в UserDefaults через AppStorage и доступно до создания
     /// первого окна, поэтому выбранная пользователем тема применяется сразу.
     @AppStorage("appearanceMode") private var appearanceMode = AppAppearance.system.rawValue
 
     init() {
+        if AthenaLocalization.runProbeIfRequested() { exit(0) }
+        if LocalizationProbe.runIfRequested() { exit(0) }
         do {
             try InstalledRuntimeBootstrap.configureEnvironment(domain: "athena")
-            container = AppContainer.makeDefault()
+            let created = AppContainer.makeDefault()
+            container = created
+            _language = StateObject(wrappedValue: LocalLanguageModel(client: created.services.localRuntimeClient))
             startupError = nil
         } catch {
             container = nil
-            startupError = error.localizedDescription
+            _language = StateObject(wrappedValue: LocalLanguageModel(client: .failure(error)))
+            startupError = .capture(error)
         }
     }
 
@@ -31,25 +38,29 @@ struct MacAssistantApp: App {
 
     var body: some Scene {
         WindowGroup("Athena") {
-            if let container {
-                ContentView(container: container)
-                    .preferredColorScheme(preferredColorScheme)
-            } else {
-                InstalledRuntimeFailureView(message: startupError ?? "Ошибка локального профиля.")
-            }
+            Group {
+                if let container {
+                    ContentView(container: container)
+                        .preferredColorScheme(preferredColorScheme)
+                } else {
+                    InstalledRuntimeFailureView(message: AgentLocalization(language: language.state.effectiveLanguage).runtimeMessage(startupError ?? RuntimeMessage("runtime.error.unknown")))
+                }
+            }.agentLanguageContext(language)
         }
         .defaultSize(width: 900, height: 620)
 
         // Оба входа используют один экран: набор подключений не должен
         // различаться в основном окне и при нажатии Cmd+,.
         Settings {
-            if let container {
-                PreferencesView(container: container)
-                    .frame(width: 640, height: 650)
-                    .preferredColorScheme(preferredColorScheme)
-            } else {
-                InstalledRuntimeFailureView(message: startupError ?? "Ошибка локального профиля.")
-            }
+            Group {
+                if let container {
+                    PreferencesView(container: container)
+                        .frame(width: 640, height: 650)
+                        .preferredColorScheme(preferredColorScheme)
+                } else {
+                    InstalledRuntimeFailureView(message: AgentLocalization(language: language.state.effectiveLanguage).runtimeMessage(startupError ?? RuntimeMessage("runtime.error.unknown")))
+                }
+            }.agentLanguageContext(language)
         }
     }
 }

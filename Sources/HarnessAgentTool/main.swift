@@ -1,5 +1,6 @@
 import Darwin
 import Foundation
+import EcosystemLocalization
 import EcosystemClientAdapters
 
 /// Локальная регистрация поддерживаемого desktop-профиля. CLI не загружает
@@ -7,10 +8,12 @@ import EcosystemClientAdapters
 @main
 struct HarnessAgentTool {
     static func main() async {
+        if LocalizationProbe.runIfRequested() { return }
         umask(0o077)
         do {
             let arguments = Array(CommandLine.arguments.dropFirst())
             if arguments == ["--help"] {
+                print(AgentLocalization(language: RuntimeLocalization.clientLanguage).runtimeText("cli.connectionHelp"))
                 print("HarnessAgentTool --action preview-connect|preview-disconnect|apply|recover|status --domain ares|athena --patch PATH --helper PATH [--application PATH] [--profile desktop] [--plan-file PATH]")
                 return
             }
@@ -62,12 +65,12 @@ struct HarnessAgentTool {
             default: throw HarnessAdapterError.invalidConfiguration
             }
         } catch let error as HarnessAdapterError {
-            fputs((error.errorDescription ?? "Ошибка подключения Harness.") + "\n", stderr)
+            fputs(AgentLocalization(language: RuntimeLocalization.clientLanguage).runtimeError(error) + "\n", stderr)
             exit(64)
         } catch {
             // Исходная ошибка YAML/декодирования может содержать пользовательский
             // текст. CLI выдаёт только известное сообщение без его содержимого.
-            fputs("Не удалось выполнить локальную операцию подключения Harness.\n", stderr)
+            fputs(AgentLocalization(language: RuntimeLocalization.clientLanguage).runtimeText("Не удалось выполнить локальную операцию подключения Harness.") + "\n", stderr)
             exit(65)
         }
     }

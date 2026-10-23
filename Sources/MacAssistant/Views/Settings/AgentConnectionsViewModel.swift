@@ -1,4 +1,5 @@
 import Foundation
+import EcosystemLocalization
 import MacAssistantCore
 import EcosystemClientAdapters
 
@@ -8,7 +9,7 @@ final class AgentConnectionsViewModel: ObservableObject {
     @Published private(set) var commands: [AgentCommand] = []
     @Published private(set) var statuses: [MCPClient: MCPConnectionStatus] = [:]
     @Published private(set) var isUpdatingConnection = false
-    @Published var error: String?
+    @Published var error: AthenaMessage?
 
     private let agentBridge: any AgentBridging
     private let connections: any MCPConnectionManaging
@@ -41,7 +42,7 @@ final class AgentConnectionsViewModel: ObservableObject {
         do {
             statuses[client] = try await connections.connect(client)
         } catch {
-            self.error = error.localizedDescription
+            self.error = .runtime(.capture(error))
             statuses[client] = await connections.status(for: client)
         }
     }
@@ -55,7 +56,7 @@ final class AgentConnectionsViewModel: ObservableObject {
         do {
             statuses[client] = try await connections.disconnect(client)
         } catch {
-            self.error = error.localizedDescription
+            self.error = .runtime(.capture(error))
             statuses[client] = await connections.status(for: client)
         }
     }
@@ -67,7 +68,7 @@ final class AgentConnectionsViewModel: ObservableObject {
         isUpdatingConnection = true; error = nil
         defer { isUpdatingConnection = false }
         do { codexPlan = try await connections.previewCodexConnection(connected: connected) }
-        catch { self.error = error.localizedDescription }
+        catch { self.error = .runtime(.capture(error)) }
     }
 
     func applyCodexPlan(_ plan: CodexConnectionPlan) async {
@@ -75,7 +76,7 @@ final class AgentConnectionsViewModel: ObservableObject {
         codexPlan = nil; isUpdatingConnection = true; error = nil
         revision += 1; defer { isUpdatingConnection = false }
         do { statuses[.codex] = try await connections.applyCodexConnection(plan) }
-        catch { self.error = error.localizedDescription; statuses[.codex] = await connections.status(for: .codex) }
+        catch { self.error = .runtime(.capture(error)); statuses[.codex] = await connections.status(for: .codex) }
     }
 
     @Published var harnessPlan: HarnessConnectionPlan?
@@ -85,7 +86,7 @@ final class AgentConnectionsViewModel: ObservableObject {
         isUpdatingConnection = true; error = nil
         defer { isUpdatingConnection = false }
         do { harnessPlan = try await connections.previewHarnessConnection(connected: connected) }
-        catch { self.error = error.localizedDescription }
+        catch { self.error = .runtime(.capture(error)) }
     }
 
     /// Системный диалог закрывает presentation-state до async-записи: принимаем
@@ -95,7 +96,7 @@ final class AgentConnectionsViewModel: ObservableObject {
         harnessPlan = nil; isUpdatingConnection = true; error = nil
         revision += 1; defer { isUpdatingConnection = false }
         do { statuses[.deepSeekHarness] = try await connections.applyHarnessConnection(plan) }
-        catch { self.error = error.localizedDescription; statuses[.deepSeekHarness] = await connections.status(for: .deepSeekHarness) }
+        catch { self.error = .runtime(.capture(error)); statuses[.deepSeekHarness] = await connections.status(for: .deepSeekHarness) }
     }
 
     func status(for client: MCPClient) -> MCPConnectionStatus {

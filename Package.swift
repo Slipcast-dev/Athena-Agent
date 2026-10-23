@@ -5,6 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "MacAssistant",
+    defaultLocalization: "en",
     platforms: [
         .macOS(.v14)
     ],
@@ -27,6 +28,7 @@ let package = Package(
     targets: [
         .executableTarget(name: "AthenaMaintenance", dependencies: [.product(name: "EcosystemLocalIPC", package: "EcosystemKit")]),
         .target(name: "MacAssistantCore", dependencies: [
+            .product(name: "EcosystemLocalization", package: "EcosystemKit"),
             .product(name: "EcosystemContracts", package: "EcosystemKit"),
             .product(name: "EcosystemLocalIPC", package: "EcosystemKit"),
             .product(name: "EcosystemClientAdapters", package: "EcosystemKit"),
@@ -35,17 +37,17 @@ let package = Package(
         ]),
         .executableTarget(
             name: "MacAssistant",
-            dependencies: ["MacAssistantCore", .product(name: "EcosystemUI", package: "EcosystemKit")],
+            dependencies: ["MacAssistantCore", .product(name: "EcosystemUI", package: "EcosystemKit"), .product(name: "EcosystemLocalization", package: "EcosystemKit")],
             // PNG Афины доступен как локальный ресурс и резервная иконка Dock,
             // без зависимости от внешнего пути на машине разработчика.
             resources: [.process("Resources")]
         ),
-        .executableTarget(name: "AthenaRuntime", dependencies: ["MacAssistantCore"]),
-        .executableTarget(name: "HarnessAgentTool", dependencies: [.product(name: "EcosystemClientAdapters", package: "EcosystemKit")]),
-        .executableTarget(name: "CodexAgentTool", dependencies: [.product(name: "EcosystemClientAdapters", package: "EcosystemKit")]),
+        .executableTarget(name: "AthenaRuntime", dependencies: [.product(name: "EcosystemLocalization", package: "EcosystemKit"), "MacAssistantCore"]),
+        .executableTarget(name: "HarnessAgentTool", dependencies: [.product(name: "EcosystemClientAdapters", package: "EcosystemKit"), .product(name: "EcosystemLocalization", package: "EcosystemKit")]),
+        .executableTarget(name: "CodexAgentTool", dependencies: [.product(name: "EcosystemClientAdapters", package: "EcosystemKit"), .product(name: "EcosystemLocalization", package: "EcosystemKit")]),
         .executableTarget(
             name: "MacAssistantMCP",
-            dependencies: ["MacAssistantCore"]
+            dependencies: ["MacAssistantCore", .product(name: "EcosystemLocalization", package: "EcosystemKit")]
         ),
         .testTarget(
             name: "MacAssistantCoreTests",

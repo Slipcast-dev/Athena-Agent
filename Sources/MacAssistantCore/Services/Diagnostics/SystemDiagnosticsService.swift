@@ -40,23 +40,23 @@ public enum DiagnosticFindingFactory {
             }
         }
         if metrics.memoryPressure == .warning {
-            findings.append(DiagnosticFinding(severity: .warning, title: "Повышенное давление памяти", explanation: "macOS сообщает о давлении памяти.", recommendation: "Проверьте ресурсоёмкие приложения и повторите измерение."))
+            findings.append(DiagnosticFinding(severity: .warning, title: "Повышенное давление памяти", explanation: "macOS сообщает о давлении памяти.", recommendation: "Проверьте ресурсоёмкие приложения и повторите измерение.", presentationCode: DiagnosticPresentationCode.memoryWarning.rawValue, presentationVersion: 1))
         }
         if metrics.memoryPressure == .critical {
-            findings.append(DiagnosticFinding(severity: .critical, title: "Высокое давление памяти", explanation: "macOS сообщает о критическом давлении памяти.", recommendation: "Закройте ненужные ресурсоёмкие приложения и повторите проверку."))
+            findings.append(DiagnosticFinding(severity: .critical, title: "Высокое давление памяти", explanation: "macOS сообщает о критическом давлении памяти.", recommendation: "Закройте ненужные ресурсоёмкие приложения и повторите проверку.", presentationCode: DiagnosticPresentationCode.memoryCritical.rawValue, presentationVersion: 1))
         }
         if findings.isEmpty {
-            findings.append(DiagnosticFinding(severity: .info, title: "Критичных признаков не обнаружено", explanation: "По доступным показателям пороги не превышены; недоступные измерения не подтверждают норму.", recommendation: "Продолжайте периодически проверять состояние Mac."))
+            findings.append(DiagnosticFinding(severity: .info, title: "Критичных признаков не обнаружено", explanation: "По доступным показателям пороги не превышены; недоступные измерения не подтверждают норму.", recommendation: "Продолжайте периодически проверять состояние Mac.", presentationCode: DiagnosticPresentationCode.noCriticalSigns.rawValue, presentationVersion: 1))
         }
         return findings
     }
 
     private static func storageFinding(severity: DiagnosticSeverity) -> DiagnosticFinding {
-        DiagnosticFinding(severity: severity, title: severity == .critical ? "Критически мало места на накопителе" : "Мало места на накопителе", explanation: "Заполнение системного накопителя превысило порог диагностики.", recommendation: "Просмотрите крупные файлы и освободите место без автоматического удаления данных.")
+        DiagnosticFinding(severity: severity, title: severity == .critical ? "Критически мало места на накопителе" : "Мало места на накопителе", explanation: "Заполнение системного накопителя превысило порог диагностики.", recommendation: "Просмотрите крупные файлы и освободите место без автоматического удаления данных.", presentationCode: (severity == .critical ? DiagnosticPresentationCode.storageCritical : .storageWarning).rawValue, presentationVersion: 1)
     }
 
     private static func cpuFinding(severity: DiagnosticSeverity) -> DiagnosticFinding {
-        DiagnosticFinding(severity: severity, title: severity == .critical ? "Критически высокая загрузка CPU" : "Высокая загрузка CPU", explanation: "Нагрузка рассчитана по разнице последовательных системных снимков CPU.", recommendation: "Повторите измерение через несколько минут и проверьте активные приложения.")
+        DiagnosticFinding(severity: severity, title: severity == .critical ? "Критически высокая загрузка CPU" : "Высокая загрузка CPU", explanation: "Нагрузка рассчитана по разнице последовательных системных снимков CPU.", recommendation: "Повторите измерение через несколько минут и проверьте активные приложения.", presentationCode: (severity == .critical ? DiagnosticPresentationCode.cpuCritical : .cpuWarning).rawValue, presentationVersion: 1)
     }
 }
 
