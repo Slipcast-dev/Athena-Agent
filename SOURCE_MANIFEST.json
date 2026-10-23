@@ -933,7 +933,7 @@
     },
     {
       "path": "Tests/MacAssistantCoreTests/AthenaScreensTests.swift",
-      "sha256": "788661d2097d2a9443b61bcdd9dd6e169c089889ca6cab27588e766a39c5e43c"
+      "sha256": "bc45a80fb37099ecee3fdd67b375580b128067bc4349d646ad1b36009b0d9d2c"
     },
     {
       "path": "Tests/MacAssistantCoreTests/AutomationRuntimeAthenaTests.swift",

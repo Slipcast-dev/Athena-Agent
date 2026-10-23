@@ -22,13 +22,21 @@ private struct LanguageStorageFixture: StorageAnalyzing {
         window.isReleasedWhenClosed = false; window.contentView = host
         window.appearance = NSAppearance(named: theme == .light ? .aqua : .darkAqua)
         defer { window.close() }
+        // На macOS 15 AppKit-backed List не рисует строки в никогда не показанном
+        // окне. Показываем только синтетическое test window без реального runtime;
+        // одного layout недостаточно для подтверждения растеризации списка.
+        window.orderFrontRegardless()
+        window.displayIfNeeded()
         try await Task.sleep(for: .milliseconds(150))
         host.layoutSubtreeIfNeeded()
         let bitmap = try XCTUnwrap(host.bitmapImageRepForCachingDisplay(in: host.bounds))
         host.cacheDisplay(in: host.bounds, to: bitmap)
+        // Шаг 16 может систематически пропустить тонкие строки текста на плоской
+        // теме macOS 15. Более плотная сетка сохраняет прежний порог, а не
+        // превращает пустую рамку в успешную проверку.
         var colors = Set<Int>()
-        for y in stride(from: 0, to: bitmap.pixelsHigh, by: 16) {
-            for x in stride(from: 0, to: bitmap.pixelsWide, by: 16) {
+        for y in stride(from: 0, to: bitmap.pixelsHigh, by: 4) {
+            for x in stride(from: 0, to: bitmap.pixelsWide, by: 4) {
                 if let color = bitmap.colorAt(x: x, y: y)?.usingColorSpace(.deviceRGB) {
                     colors.insert(Int(color.redComponent * 255) << 16 | Int(color.greenComponent * 255) << 8 | Int(color.blueComponent * 255))
                 }
