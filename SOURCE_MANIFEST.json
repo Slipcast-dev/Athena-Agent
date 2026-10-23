@@ -1045,11 +1045,11 @@
     },
     {
       "path": "docs/INSTALL.en.md",
-      "sha256": "7e6da1143eead4b32c3260cf4b2174cb9fba18935525a638f0e52ea190aa75fd"
+      "sha256": "89b2b79dfccd8fa41fed325119ad63f8b57033d2d6d0afae0515cf59b7c44f99"
     },
     {
       "path": "docs/INSTALL.ru.md",
-      "sha256": "9f42be52f889413cb2ef0faeddd9a84d25cc188f52ec693b01447e4443fe39ea"
+      "sha256": "41e8b2727ca91ee7fc4c3828d8d867deff915c1df1abd0f989dd5dd1db2b1a3d"
     },
     {
       "path": "docs/LIFECYCLE.md",
@@ -1069,7 +1069,7 @@
     },
     {
       "path": "docs/STATUS.md",
-      "sha256": "d6f24ea7c1fa253ce84a22e72e7906ee820a923e9dc444671943b833a8375f58"
+      "sha256": "23a712e58499ce8e5f51d0896cffb63fe45c2660ab3ab73d1fc7394bdd9814a7"
     },
     {
       "path": "docs/assets/athena-banner.png",
