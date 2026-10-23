@@ -20,6 +20,7 @@ public final class AppContainer {
 
 public struct ServiceDependencies: Sendable {
     public let localRuntimeClient: Result<LocalRPCClient, Error>?
+    public let liveMonitoring: any LiveMonitoringProviding
     public let systemInformation: any SystemInformationProviding
     public let diagnostics: any SystemDiagnosing
     public let storage: any StorageAnalyzing
@@ -36,9 +37,11 @@ public struct ServiceDependencies: Sendable {
         aiProfiles: any AIProfileManaging,
         agentBridge: any AgentBridging,
         mcpConnections: any MCPConnectionManaging,
-        localRuntimeClient: Result<LocalRPCClient, Error>? = nil
+        localRuntimeClient: Result<LocalRPCClient, Error>? = nil,
+        liveMonitoring: any LiveMonitoringProviding = UnavailableLiveMonitoringService()
     ) {
         self.localRuntimeClient = localRuntimeClient
+        self.liveMonitoring = liveMonitoring
         self.systemInformation = systemInformation
         self.diagnostics = diagnostics
         self.storage = storage
@@ -75,7 +78,9 @@ public struct ServiceDependencies: Sendable {
             systemInformation: systemInformation, diagnostics: diagnostics, storage: storage,
             ai: UnavailableAIService(), aiProfiles: UnavailableAIProfileManager(),
             agentBridge: LocalAgentBridge(systemInformation: systemInformation, diagnostics: diagnostics, storage: storage, remote: remote),
-            mcpConnections: MCPConnectionService(), localRuntimeClient: remote
+            mcpConnections: MCPConnectionService(), localRuntimeClient: remote,
+            liveMonitoring: remote.map { RemoteLiveMonitoringService(client: $0) as any LiveMonitoringProviding }
+                ?? (role == .gui ? MonitoringCoordinator.makeLive() as any LiveMonitoringProviding : UnavailableLiveMonitoringService())
         )
     }
 }

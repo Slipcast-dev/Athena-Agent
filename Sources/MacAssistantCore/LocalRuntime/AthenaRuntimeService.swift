@@ -8,10 +8,18 @@ public actor AthenaRuntimeService {
     public let automation: LocalAutomationService?
     private let login: LocalLoginRegistration?
     private let history: LocalMCPHistory?
+    public let liveMonitoring: MonitoringCoordinator
+    private var changingEmergency = false
+    private var emergencyRevision: UInt64 = 0
     private let instanceID = UUID()
     private var changing = false
     private var admitting = 0
-    public init(work: AthenaQueuedWork, grants: AthenaLocalGrants, automation: LocalAutomationService? = nil, login: LocalLoginRegistration? = nil, history: LocalMCPHistory? = nil) { self.work = work; self.grants = grants; self.automation = automation; self.login = login; self.history = history }
+    public init(work: AthenaQueuedWork, grants: AthenaLocalGrants,
+                automation: LocalAutomationService? = nil, login: LocalLoginRegistration? = nil,
+                history: LocalMCPHistory? = nil, liveMonitoring: MonitoringCoordinator = .makeLive()) {
+        self.work = work; self.grants = grants; self.automation = automation
+        self.login = login; self.history = history; self.liveMonitoring = liveMonitoring
+    }
     private var backgroundWake: (@Sendable () -> Void)?
     public func setBackgroundWake(_ action: @escaping @Sendable () -> Void) { backgroundWake = action }
     public func nextBackgroundDelay() async -> TimeInterval? {
@@ -44,6 +52,17 @@ public actor AthenaRuntimeService {
         await automation.flushNotifications()
     }
     public func handle(role: LocalRole, clientID: LocalMCPClient? = nil, request: LocalRPCRequest) async throws -> Data {
+        if request.operation.hasPrefix("monitoring.") {
+            // Проверка роли предшествует декодированию и чтению очереди: даже
+            // имеющий прежние grants MCP не получает новый поток данных.
+            guard role == .gui else { throw LocalRuntimeFailure.denied }
+            guard !changingEmergency else { throw LocalRuntimeFailure.busy }
+            let revision = emergencyRevision
+            let status = try await work.emergencyStatus()
+            guard revision == emergencyRevision, !changingEmergency else { throw LocalRuntimeFailure.busy }
+            if status.stopped { await liveMonitoring.synchronizeEmergency(suspended: true, revision: revision) }
+            return try await LiveMonitoringControl.handle(request, coordinator: liveMonitoring)
+        }
         if request.operation.hasPrefix("language.") {
             guard let automation else { throw LocalRuntimeFailure.denied }
             return try await LocalLanguageControl.handle(store: automation.language, role: role, request: request)
@@ -51,11 +70,22 @@ public actor AthenaRuntimeService {
         if request.operation.hasPrefix("operations.emergency_") {
             guard role == .gui else { throw LocalRuntimeFailure.denied }
             _ = try LocalWire.decode(LocalEmpty.self, request.payload, keys: [])
+            guard !changingEmergency else { throw LocalRuntimeFailure.busy }
+            changingEmergency = true
+            emergencyRevision &+= 1
+            let revision = emergencyRevision
+            defer { changingEmergency = false }
             switch request.operation {
             case "operations.emergency_status": return try LocalWire.encode(await work.emergencyStatus())
-            case "operations.emergency_stop": return try LocalWire.encode(await work.emergencyStop())
+            case "operations.emergency_stop":
+                // Fail closed: сначала блокируем быстрый сбор. Даже при ошибке
+                // durable latch вернуть его может только явный успешный resume.
+                await liveMonitoring.synchronizeEmergency(suspended: true, revision: revision)
+                return try LocalWire.encode(await work.emergencyStop())
             case "operations.emergency_resume":
-                let result = try await work.resumeAdmission(); backgroundWake?(); return try LocalWire.encode(result)
+                let result = try await work.resumeAdmission()
+                await liveMonitoring.synchronizeEmergency(suspended: false, revision: revision)
+                backgroundWake?(); return try LocalWire.encode(result)
             default: throw LocalRuntimeFailure.denied
             }
         }

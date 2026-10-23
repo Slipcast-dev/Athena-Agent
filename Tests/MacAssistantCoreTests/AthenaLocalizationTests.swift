@@ -57,9 +57,9 @@ actor LanguageSystemFixture: SystemInformationProviding {
         XCTAssertEqual(en.text("Обзор"), "Overview")
     }
     func testNavigationMonitorAndAppearanceIdentifiersRemainStable() {
-        XCTAssertEqual(AppSection.allCases.map(\.rawValue), ["dashboard", "diagnostics", "storage", "settings"])
+        XCTAssertEqual(AppSection.allCases.map(\.rawValue), ["processor", "network", "disk", "memory", "battery", "diagnostics", "settings"])
         XCTAssertEqual(AppAppearance.allCases.map(\.rawValue), ["system", "light", "dark"])
-        XCTAssertEqual(AppSection.allCases.map { en.text($0.title) }, ["Overview", "Diagnostics", "Storage", "Settings"])
+        XCTAssertEqual(AppSection.allCases.map { en.text($0.title) }, ["Processor", "Network", "Disk", "Memory", "Battery", "Diagnostics", "Settings"])
         XCTAssertEqual(MonitorMetric.allCases.map(\.rawValue), ["cpu", "storage", "memoryPressure"])
         let statuses: [MonitorStatus] = [.normal, .warmingUp, .warning, .critical, .recovered, .unavailable]
         XCTAssertEqual(Set(statuses.map { en.text(MonitorPresentation.statusTitle($0)) }).count, statuses.count)
@@ -80,15 +80,15 @@ actor LanguageSystemFixture: SystemInformationProviding {
     }
     func testLanguageRenderingDoesNotPollSensorsOrMutateSnapshot() async throws {
         let metrics = Self.metrics(), fixture = LanguageSystemFixture(metrics: Self.metrics())
-        let model = DashboardViewModel(systemInformation: fixture)
-        await model.refresh()
+        let model = SystemIdentityViewModel(systemInformation: fixture)
+        await model.load()
         let before = await fixture.calls
         for l10n in [ru, en, ru, en] {
             _ = AthenaMetricPresentation.cpu(metrics, using: l10n)
             _ = AthenaMetricPresentation.freshness(metrics, now: metrics.capturedAt, using: l10n)
         }
         let after = await fixture.calls
-        XCTAssertEqual(after, before); XCTAssertEqual(before, 2)
+        XCTAssertEqual(after, before); XCTAssertEqual(before, 1)
         XCTAssertEqual(metrics.cpuUsagePercent, 20)
     }
     func testDiagnosticsAndRealStorageScanPreserveResultsAcrossLanguages() async throws {
@@ -110,7 +110,7 @@ actor LanguageSystemFixture: SystemInformationProviding {
         let handle = try FileHandle(forWritingTo: file)
         // Sparse-файл даёт реальный stat большого файла без заполнения диска.
         try handle.truncate(atOffset: 105_000_000); try handle.close()
-        let storage = StorageViewModel(storage: StorageAnalysisService())
+        let storage = FolderAnalysisViewModel(storage: StorageAnalysisService())
         storage.startScan(directory: base)
         for _ in 0..<300 where storage.state == .loading { try await Task.sleep(for: .milliseconds(10)) }
         XCTAssertEqual(storage.state, .ready); XCTAssertEqual(storage.items.count, 1)

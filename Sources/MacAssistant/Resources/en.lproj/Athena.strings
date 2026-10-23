@@ -2,62 +2,162 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key> А</key>
+	<string> A</string>
+	<key> В</key>
+	<string> V</string>
+	<key> Вт</key>
+	<string> W</string>
 	<key>%@ · %@</key>
 	<string>%@ · %@</string>
 	<key>%@ · свободно %@</key>
 	<string>%@ · %@ free</string>
 	<key>%@ из %@</key>
 	<string>%@ of %@</string>
+	<key>%@ мин</key>
+	<string>%@ min</string>
+	<key>%@ производительных · %@ энергоэффективных</key>
+	<string>%@ performance · %@ efficiency</string>
 	<key>%@ физических / %@ логических</key>
 	<string>Physical: %@ / logical: %@</string>
+	<key>/с</key>
+	<string>/s</string>
+	<key>1 мин</key>
+	<string>1 min</string>
+	<key>15 мин</key>
+	<string>15 min</string>
+	<key>5 мин</key>
+	<string>5 min</string>
 	<key>Athena не отправляет данные облачным ИИ-провайдерам. Если вы передаёте результат внешнему агенту, дальнейшая обработка зависит от настроек Codex или Harness.</key>
 	<string>Athena does not send data to cloud AI providers. If you share a result with an external agent, subsequent processing depends on your Codex or Harness settings.</string>
 	<key>CPU</key>
 	<string>CPU</string>
+	<key>MTU</key>
+	<string>MTU</string>
+	<key>Wi-Fi</key>
+	<string>Wi-Fi</string>
+	<key>Wired-память</key>
+	<string>Wired memory</string>
 	<key>«Как в системе» автоматически следует теме macOS.</key>
 	<string>“System” automatically follows the macOS appearance.</string>
+	<key>«—» означает, что macOS не предоставила показатель или он сейчас неприменим. Время работы — оценка macOS; ток со знаком, мощность адаптера — номинальная.</key>
+	<string>“—” means macOS did not provide a reading or it is not currently applicable. Time remaining is estimated by macOS; current is signed and adapter power is its rating.</string>
+	<key>Ёмкость</key>
+	<string>Capacity</string>
+	<key>Ёмкость относительно проектной</key>
+	<string>Capacity relative to design</string>
+	<key>Ёмкость томов обновляется каждые 10 секунд</key>
+	<string>Volume capacity refreshes every 10 seconds</string>
+	<key>Адресов нет</key>
+	<string>No addresses</string>
+	<key>Аккумулятор</key>
+	<string>Battery</string>
 	<key>Анализировать</key>
 	<string>Analyze</string>
 	<key>Архитектура</key>
 	<string>Architecture</string>
+	<key>Б/с</key>
+	<string>B/s</string>
 	<key>Версия</key>
 	<string>Version</string>
+	<key>Включён</key>
+	<string>On</string>
+	<key>Внешнее питание</key>
+	<string>External power</string>
 	<key>Внешние агенты могут получать сведения о Mac, системные показатели, диагностику и сводку накопителя. Изменение файлов и выполнение команд терминала недоступны.</key>
 	<string>External agents can obtain Mac information, system metrics, diagnostics, and a storage overview. File changes and terminal commands are unavailable.</string>
+	<key>Внутренний аккумулятор отсутствует</key>
+	<string>No internal battery</string>
 	<key>Восстановлено</key>
 	<string>Recovered</string>
+	<key>Время</key>
+	<string>Time</string>
+	<key>Время рассчитывается</key>
+	<string>Calculating time</string>
 	<key>Выберите пользовательский каталог. Файлы не будут изменены.</key>
 	<string>Choose a user folder. Files will not be changed.</string>
 	<key>Выбрать каталог</key>
 	<string>Choose folder</string>
+	<key>Выключен</key>
+	<string>Off</string>
 	<key>Выключено</key>
 	<string>Disabled</string>
 	<key>Выключить</key>
 	<string>Disable</string>
+	<key>ГиБ</key>
+	<string>GiB</string>
+	<key>Глобальные DNS-серверы</key>
+	<string>Global DNS servers</string>
+	<key>График</key>
+	<string>Chart</string>
+	<key>График загрузки процессора</key>
+	<string>Processor usage chart</string>
+	<key>График заряда аккумулятора</key>
+	<string>Battery charge history</string>
+	<key>График сетевого трафика</key>
+	<string>Network traffic history</string>
+	<key>График ядра %@</key>
+	<string>Core %@ chart</string>
+	<key>Группировка</key>
+	<string>Grouping</string>
 	<key>Давление памяти</key>
 	<string>Memory pressure</string>
+	<key>Данные интерфейса</key>
+	<string>Interface details</string>
+	<key>Данные устарели. Ожидание свежего измерения.</key>
+	<string>Data is stale. Waiting for a fresh measurement.</string>
 	<key>Диагностика</key>
 	<string>Diagnostics</string>
 	<key>Диагностика ещё не запускалась</key>
 	<string>Diagnostics has not run yet</string>
+	<key>Диск</key>
+	<string>Disk</string>
+	<key>До полной зарядки, оценка</key>
+	<string>Time to full, estimated</string>
+	<key>До разряда, оценка</key>
+	<string>Time to empty, estimated</string>
 	<key>Добавить проверку</key>
 	<string>Add check</string>
 	<key>Доступ и безопасность</key>
 	<string>Access and security</string>
 	<key>Доступно RAM</key>
 	<string>Available RAM</string>
+	<key>Доступно ОЗУ</key>
+	<string>RAM available</string>
+	<key>Доступно для важных записей</key>
+	<string>Available for important usage</string>
+	<key>Доступное для важных записей место учитывает ресурсы, которые macOS может освободить; оно отличается от свободного места.</key>
+	<string>Space available for important usage includes resources macOS can reclaim; it differs from free space.</string>
 	<key>Доступные операции</key>
 	<string>Available operations</string>
 	<key>Загрузка CPU</key>
 	<string>CPU usage</string>
+	<key>Загрузка по ядрам</key>
+	<string>Usage by core</string>
 	<key>Загрузка…</key>
 	<string>Loading…</string>
+	<key>Закрыть</key>
+	<string>Close</string>
+	<key>Занято ОЗУ</key>
+	<string>RAM used</string>
+	<key>Занято на диске</key>
+	<string>Disk space used</string>
+	<key>Заполнение тома</key>
+	<string>Volume usage</string>
 	<key>Запросить включение</key>
 	<string>Request activation</string>
 	<key>Запустить диагностику</key>
 	<string>Run diagnostics</string>
 	<key>Запустить локальную системную диагностику</key>
 	<string>Run local system diagnostics</string>
+	<key>Заряд аккумулятора</key>
+	<string>Battery charge</string>
+	<key>Заряд, %</key>
+	<string>Charge, %</string>
+	<key>Зарядка аккумулятора</key>
+	<string>Charging status</string>
+	<key>Заряжается</key>
+	<string>Charging</string>
 	<key>Измерение доступно</key>
 	<string>Measurement available</string>
 	<key>Измерение не поддерживается</key>
@@ -68,14 +168,44 @@
 	<string>Measuring…</string>
 	<key>Измерения собраны</key>
 	<string>Measurements collected</string>
+	<key>Имя</key>
+	<string>Name</string>
+	<key>Индикаторы соответствуют логическим процессорам. Выберите ядро для графика.</key>
+	<string>Indicators represent logical processors. Select a core to view its chart.</string>
+	<key>Интерфейс</key>
+	<string>Interface</string>
+	<key>Интерфейс включён</key>
+	<string>Interface enabled</string>
+	<key>Интерфейс выключен</key>
+	<string>Interface disabled</string>
+	<key>Интерфейсов обнаружено: %@ · не показано: %@</key>
+	<string>Interfaces observed: %@ · omitted: %@</string>
 	<key>Использование RAM</key>
 	<string>RAM usage</string>
+	<key>Использовано swap</key>
+	<string>Swap used</string>
+	<key>История памяти</key>
+	<string>Memory history</string>
+	<key>Источник отключён</key>
+	<string>Power source offline</string>
+	<key>Источник питания</key>
+	<string>Power source</string>
 	<key>Как в системе</key>
 	<string>System</string>
+	<key>Канал Wi-Fi</key>
+	<string>Wi-Fi channel</string>
 	<key>Каталог для анализа не выбран</key>
 	<string>No folder selected for analysis</string>
+	<key>Каталог охватывает стандартные папки приложений. Подсчёт ограничен временем и числом файлов; неполные размеры отмечены ≥.</key>
+	<string>The catalogue covers standard application folders. Time and file limits apply; incomplete sizes are marked ≥.</string>
+	<key>Каталог приложений недоступен</key>
+	<string>App catalogue unavailable</string>
+	<key>Критическое давление</key>
+	<string>Critical pressure</string>
 	<key>Критическое состояние</key>
 	<string>Critical</string>
+	<key>Крупные файлы</key>
+	<string>Large files</string>
 	<key>Крупные файлы не найдены</key>
 	<string>No large files found</string>
 	<key>Локальная диагностика</key>
@@ -84,8 +214,14 @@
 	<string>Local Mac diagnostics. Chat with AI in Codex or DeepSeek Harness connected to Athena.</string>
 	<key>Локальная сборка</key>
 	<string>Local build</string>
+	<key>Локальные IPv4 / IPv6</key>
+	<string>Local IPv4 / IPv6</string>
+	<key>Локальный loopback-интерфейс</key>
+	<string>Local loopback interface</string>
 	<key>Локальный мониторинг</key>
 	<string>Local monitoring</string>
+	<key>МБ/с</key>
+	<string>MB/s</string>
 	<key>Модель</key>
 	<string>Model</string>
 	<key>Модель и провайдер наследуются из настроек Codex.</key>
@@ -96,44 +232,108 @@
 	<string>Model, macOS version, architecture, and core count without the serial number.</string>
 	<key>Мониторинг</key>
 	<string>Monitoring</string>
+	<key>Мониторинг аккумулятора</key>
+	<string>Battery monitoring</string>
+	<key>Мониторинг остановлен аварийной кнопкой. Возобновите его в настройках.</key>
+	<string>Monitoring was stopped with the emergency button. Resume it in Settings.</string>
+	<key>Мощность адаптера, номинальная</key>
+	<string>Adapter power, rated</string>
+	<key>На диске, оценка</key>
+	<string>On disk, estimate</string>
+	<key>Наведите указатель на график, чтобы увидеть значение.</key>
+	<string>Move the pointer over the chart to inspect a measurement.</string>
+	<key>Нагрузка, %</key>
+	<string>Usage, %</string>
+	<key>Найдено: %@ · показано: %@ · просмотрено объектов: %@</key>
+	<string>Discovered: %@ · shown: %@ · entries visited: %@</string>
 	<key>Накопитель</key>
 	<string>Storage</string>
 	<key>Накопление измерений</key>
 	<string>Collecting measurements</string>
+	<key>Накопленные счётчики могут сбрасываться при переподключении интерфейса.</key>
+	<string>Cumulative counters may reset when the interface reconnects.</string>
+	<key>Направление</key>
+	<string>Direction</string>
+	<key>Напряжение аккумулятора</key>
+	<string>Battery voltage</string>
 	<key>Настроено</key>
 	<string>Configured</string>
 	<key>Настройки</key>
 	<string>Settings</string>
+	<key>Не заряжается</key>
+	<string>Not charging</string>
+	<key>Не обеспечивает питание</key>
+	<string>Unable to supply power</string>
 	<key>Не подключено</key>
 	<string>Not connected</string>
 	<key>Не удалось загрузить данные</key>
 	<string>Unable to load data</string>
 	<key>Не удалось изменить подключение</key>
 	<string>Could not change the connection</string>
+	<key>Несколько внутренних аккумуляторов: эта конфигурация пока не поддерживается.</key>
+	<string>Multiple internal batteries: this configuration is not yet supported.</string>
 	<key>Нет данных</key>
 	<string>No data</string>
+	<key>Нет подходящих процессов</key>
+	<string>No matching processes</string>
+	<key>Нет приложений для отображения</key>
+	<string>No apps to display</string>
 	<key>Норма</key>
 	<string>Normal</string>
+	<key>Нормальное давление</key>
+	<string>Normal pressure</string>
 	<key>О приложении</key>
 	<string>About</string>
+	<key>ОЗУ: каждую секунду · процессы: каждые 5 секунд</key>
+	<string>RAM: every second · processes: every 5 seconds</string>
 	<key>Обзор</key>
 	<string>Overview</string>
+	<key>Обнаружено: %@ · доступно: %@ · без данных: %@ · не показано: %@</key>
+	<string>Observed: %@ · readable: %@ · unavailable: %@ · omitted: %@</string>
 	<key>Обновить</key>
 	<string>Refresh</string>
 	<key>Обновить мониторинг</key>
 	<string>Refresh monitoring</string>
+	<key>Обновить сведения о Mac</key>
+	<string>Refresh Mac information</string>
 	<key>Обновить системные показатели</key>
 	<string>Refresh system metrics</string>
+	<key>Обновить список</key>
+	<string>Refresh list</string>
 	<key>Обновить статусы</key>
 	<string>Refresh statuses</string>
+	<key>Обновление каждую секунду</key>
+	<string>Updates every second</string>
 	<key>Обновление подключения…</key>
 	<string>Updating connection…</string>
+	<key>Обновление приостановлено</key>
+	<string>Updates paused</string>
+	<key>Обновление списка приостановлено</key>
+	<string>List refresh paused</string>
 	<key>Обновлено: %@</key>
 	<string>Updated: %@</string>
+	<key>Общая нагрузка</key>
+	<string>Total usage</string>
+	<key>Общие приложения</key>
+	<string>Shared applications</string>
 	<key>Общий и доступный объём системного накопителя без путей и списка файлов.</key>
 	<string>Total and available system storage without paths or file lists.</string>
+	<key>Ограниченная ёмкость</key>
+	<string>Limited capacity</string>
+	<key>Ожидание анализа прекращено</key>
+	<string>Stopped waiting for analysis</string>
+	<key>Ожидание данных процессов</key>
+	<string>Waiting for process data</string>
+	<key>Ожидание измерений для графика</key>
+	<string>Waiting for chart measurements</string>
 	<key>Описания изменений и сообщения внешних служб показаны на исходном языке.</key>
 	<string>Change descriptions and external service messages are shown in their original language.</string>
+	<key>Основной IPv4-интерфейс</key>
+	<string>Primary IPv4 interface</string>
+	<key>Основной IPv6-интерфейс</key>
+	<string>Primary IPv6 interface</string>
+	<key>От аккумулятора</key>
+	<string>Battery power</string>
 	<key>Отключить</key>
 	<string>Disconnect</string>
 	<key>Отключить %@</key>
@@ -146,14 +346,52 @@
 	<string>Cancel</string>
 	<key>Отменить диагностику</key>
 	<string>Cancel diagnostics</string>
+	<key>Отправлено всего</key>
+	<string>Total sent</string>
 	<key>Отчёт</key>
 	<string>Report</string>
 	<key>Оформление</key>
 	<string>Appearance</string>
 	<key>Ошибка локального профиля.</key>
 	<string>Local profile error.</string>
+	<key>Ошибки: приём / передача</key>
+	<string>Errors: received / sent</string>
+	<key>Пакеты: приём / передача</key>
+	<string>Packets: received / sent</string>
+	<key>Память</key>
+	<string>Memory</string>
+	<key>Память приложений и процессов</key>
+	<string>App and process memory</string>
+	<key>Память приложений рассчитана по доступным процессам. Вспомогательные процессы объединены, если принадлежат тому же приложению. Сумма может отличаться от занятой ОЗУ. Показано не более 512 процессов.</key>
+	<string>App memory is calculated from accessible processes. Helpers belonging to the same app are grouped. The sum may differ from RAM used. Up to 512 processes are shown.</string>
+	<key>Память процесса по данным macOS</key>
+	<string>Process memory reported by macOS</string>
+	<key>Папка недоступна</key>
+	<string>Folder inaccessible</string>
+	<key>Папка отсутствует</key>
+	<string>Folder missing</string>
+	<key>Папка прочитана</key>
+	<string>Folder read</string>
+	<key>Параметры обновлены: %@</key>
+	<string>Settings updated: %@</string>
+	<key>Параметры обновляются каждые 5 секунд. VPN может использовать отдельные маршруты и DNS.</key>
+	<string>Settings refresh every 5 seconds. VPN may use separate routes and DNS.</string>
+	<key>Передача</key>
+	<string>Sent</string>
+	<key>Период графика</key>
+	<string>Chart range</string>
+	<key>По имени</key>
+	<string>By name</string>
+	<key>По месту на диске</key>
+	<string>By space on disk</string>
+	<key>По памяти</key>
+	<string>By memory</string>
+	<key>По размеру файлов</key>
+	<string>By file size</string>
 	<key>Повторите попытку обновления.</key>
 	<string>Try refreshing again.</string>
+	<key>Повышенное давление</key>
+	<string>Elevated pressure</string>
 	<key>Подключение субагента Codex</key>
 	<string>Codex subagent connection</string>
 	<key>Подключение субагента Harness</key>
@@ -168,12 +406,26 @@
 	<string>Connect %@</string>
 	<key>Подключить Athena</key>
 	<string>Connect Athena</string>
+	<key>Подсчёт размеров приложений…</key>
+	<string>Calculating app sizes…</string>
 	<key>Подтвердить мониторинг</key>
 	<string>Confirm monitoring</string>
+	<key>Поиск по имени или PID</key>
+	<string>Search by name or PID</string>
+	<key>Поиск приложения</key>
+	<string>Search apps</string>
+	<key>Показана известная сумма; данные приложения могут быть неполными.</key>
+	<string>The known sum is shown; app data may be incomplete.</string>
+	<key>Показано до 32 локальных томов. Тома APFS могут использовать общий контейнер; их ёмкости не складываются.</key>
+	<string>Up to 32 local volumes are shown. APFS volumes may share a container; capacities are not added together.</string>
+	<key>Показатели обновляются каждые 15 секунд. История хранится в памяти до 15 минут во время мониторинга.</key>
+	<string>Readings update every 15 seconds. Up to 15 minutes of history is kept in memory while monitoring.</string>
 	<key>Показатели системы</key>
 	<string>System metrics</string>
 	<key>Показатели устарели. Обновите данные перед оценкой состояния.</key>
 	<string>Metrics are stale. Refresh before assessing the current state.</string>
+	<key>Показатель «занято» — оценка. Кэш может быть освобождён macOS; категории памяти пересекаются.</key>
+	<string>RAM used is an estimate. macOS can reclaim cache; memory categories overlap.</string>
 	<key>Показатель: %@
 Интервал: %@ с
 Окно, число измерений: %@
@@ -188,57 +440,173 @@ Warning threshold: %@
 Critical threshold: %@
 Recovery: ≤ %@
 Notification cooldown (s): %@</string>
+	<key>Показать график этого ядра</key>
+	<string>Show this core’s chart</string>
+	<key>Показываются до 1000 файлов от 100 МиБ. Недоступные файлы и символьные ссылки пропускаются; содержимое пакетов не анализируется.</key>
+	<string>Up to 1000 files of at least 100 MiB are shown. Inaccessible files and symbolic links are skipped; package contents are not analyzed.</string>
 	<key>Показываются файлы от 100 МБ.</key>
 	<string>Files of at least 100 MB are shown.</string>
+	<key>Полностью заряжен</key>
+	<string>Fully charged</string>
+	<key>Получено всего</key>
+	<string>Total received</string>
+	<key>Пользователь</key>
+	<string>User</string>
 	<key>Последние переходы состояния</key>
 	<string>Recent state transitions</string>
 	<key>Предупреждение</key>
 	<string>Warning</string>
+	<key>Прекратить ожидание</key>
+	<string>Stop waiting</string>
 	<key>Приложение</key>
 	<string>Application</string>
+	<key>Приложения</key>
+	<string>Apps</string>
+	<key>Приложения пользователя</key>
+	<string>User applications</string>
+	<key>Приостановить мониторинг</key>
+	<string>Pause monitoring</string>
+	<key>Приём</key>
+	<string>Received</string>
 	<key>Проверить план мониторинга</key>
 	<string>Review monitoring plan</string>
 	<key>Проверка %@</key>
 	<string>%@ check</string>
+	<key>Продолжить мониторинг</key>
+	<string>Resume monitoring</string>
 	<key>Процент занятой RAM не используется. Недоступный pressure означает отсутствие измерения.</key>
 	<string>RAM usage percentage is not used. Unavailable memory pressure means there is no measurement.</string>
+	<key>Процент ёмкости рассчитывается только по совместимым полям IOPS. Абсолютная ёмкость и температура из неподтверждённых полей драйвера не используются.</key>
+	<string>Capacity percentage uses compatible IOPS fields only. Absolute capacity and temperature from unverified driver fields are not used.</string>
+	<key>Процессов: %@</key>
+	<string>Processes: %@</string>
+	<key>Процессор</key>
+	<string>Processor</string>
+	<key>Процессы</key>
+	<string>Processes</string>
+	<key>Процессы обновлены: %@</key>
+	<string>Processes updated: %@</string>
 	<key>Работает без модели и открытого окна. Уведомления зависят от настроек фоновой работы и разрешения macOS.</key>
 	<string>Works without a model or an open window. Notifications depend on background settings and macOS permission.</string>
+	<key>Радиолинк показывает скорость Wi-Fi соединения; фактический трафик отображается на графике.</key>
+	<string>Radio link rate describes the Wi-Fi connection; the chart shows actual traffic.</string>
 	<key>Раздел диагностики</key>
 	<string>Diagnostics section</string>
+	<key>Размер определён частично</key>
+	<string>Size partially measured</string>
+	<key>Размер файлов</key>
+	<string>File size</string>
+	<key>Размеры относятся к файлам приложения, включая вложенные компоненты. Данные и кэши в Library не входят. Ссылки пропускаются; APFS-клоны могут разделять блоки.</key>
+	<string>Sizes cover app files, including nested components. Library data and caches are excluded. Symlinks are skipped; APFS clones may share blocks.</string>
 	<key>Результаты диагностики</key>
 	<string>Diagnostic results</string>
 	<key>Сведения о Mac</key>
 	<string>Mac information</string>
 	<key>Светлая</key>
 	<string>Light</string>
+	<key>Свободно на диске</key>
+	<string>Free disk space</string>
 	<key>Сводка накопителя</key>
 	<string>Storage overview</string>
+	<key>Сервисное состояние</key>
+	<string>Service condition</string>
+	<key>Сеть</key>
+	<string>Network</string>
+	<key>Сжатая память</key>
+	<string>Compressed memory</string>
+	<key>Сигнал RSSI, дБм</key>
+	<string>RSSI signal, dBm</string>
+	<key>Символьная ссылка пропущена</key>
+	<string>Symbolic link skipped</string>
+	<key>Система</key>
+	<string>System</string>
+	<key>Системная конфигурация сети</key>
+	<string>System network configuration</string>
 	<key>Системные показатели недоступны</key>
 	<string>System metrics are unavailable</string>
+	<key>Системные приложения</key>
+	<string>System applications</string>
+	<key>Сканирование завершено</key>
+	<string>Scan complete</string>
+	<key>Скорость радиолинка, Мбит/с</key>
+	<string>Radio link rate, Mbps</string>
 	<key>Собираются только локальные системные показатели без прав администратора.</key>
 	<string>Only local system metrics are collected, without administrator privileges.</string>
+	<key>Соединение точка-точка / туннель</key>
+	<string>Point-to-point connection / tunnel</string>
+	<key>Сортировка</key>
+	<string>Sort</string>
+	<key>Состояние</key>
+	<string>Status</string>
+	<key>Состояние аккумулятора</key>
+	<string>Battery health</string>
+	<key>Список от %@ · кэш до 5 минут</key>
+	<string>List captured at %@ · cached up to 5 minutes</string>
+	<key>Список получен частично</key>
+	<string>Catalogue partially available</string>
+	<key>Список процессов может быть неполным</key>
+	<string>The process list may be incomplete</string>
 	<key>Срок плана: %@</key>
 	<string>Plan expires: %@</string>
 	<key>Статус показывает наличие настройки MCP, а не активное соединение. После подключения или отключения перезапустите соответствующий клиент.</key>
 	<string>The status indicates an MCP configuration, not an active connection. Restart the corresponding client after connecting or disconnecting.</string>
 	<key>Структурированный отчёт и безопасные рекомендации, созданные локально.</key>
 	<string>A structured report and safe recommendations generated locally.</string>
+	<key>Таблица процессов не обновляется</key>
+	<string>Process table is not updating</string>
 	<key>Текст сохранённого отчёта показан на исходном языке.</key>
 	<string>Saved report text is shown in its original language.</string>
 	<key>Текущие CPU, память и свободное место без истории процессов.</key>
 	<string>Current CPU, memory, and free space without process history.</string>
 	<key>Тема</key>
 	<string>Theme</string>
+	<key>Температура аккумулятора</key>
+	<string>Battery temperature</string>
+	<key>Ток аккумулятора</key>
+	<string>Battery current</string>
 	<key>Только чтение данных</key>
 	<string>Read-only access</string>
+	<key>Том</key>
+	<string>Volume</string>
+	<key>Том доступен только для чтения</key>
+	<string>Read-only volume</string>
+	<key>Трафик выбранного интерфейса. VPN и физические интерфейсы учитываются отдельно.</key>
+	<string>Traffic for the selected interface. VPN and physical interfaces are shown separately.</string>
+	<key>Требуется замена аккумулятора</key>
+	<string>Battery replacement required</string>
+	<key>Требуется проверка аккумулятора</key>
+	<string>Battery service recommended</string>
 	<key>Тёмная</key>
 	<string>Dark</string>
+	<key>Установленные приложения</key>
+	<string>Installed apps</string>
+	<key>Установлено ОЗУ</key>
+	<string>Installed RAM</string>
+	<key>Файловый кэш</key>
+	<string>File-backed cache</string>
+	<key>Фоновую задачу можно проверить и остановить в настройках, в списке задач.</key>
+	<string>You can inspect and stop the background task in the task list in Settings.</string>
+	<key>Хорошее</key>
+	<string>Good</string>
+	<key>Циклы зарядки</key>
+	<string>Charge cycles</string>
 	<key>Часть измерений недоступна или подготавливается</key>
 	<string>Some measurements are unavailable or warming up</string>
+	<key>Шлюз IPv4</key>
+	<string>IPv4 gateway</string>
+	<key>Шлюз IPv6</key>
+	<string>IPv6 gateway</string>
+	<key>Шум, дБм</key>
+	<string>Noise, dBm</string>
+	<key>Это обычное состояние настольного Mac. Внешние ИБП здесь не отображаются.</key>
+	<string>This is normal for a desktop Mac. External UPS devices are not shown here.</string>
 	<key>Этот Mac</key>
 	<string>This Mac</string>
 	<key>Ядра CPU</key>
 	<string>CPU cores</string>
+	<key>Ядро</key>
+	<string>Core</string>
+	<key>Ядро %@</key>
+	<string>Core %@</string>
 </dict>
 </plist>

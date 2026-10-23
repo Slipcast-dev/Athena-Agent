@@ -16,10 +16,12 @@ struct PreferencesView: View {
     private let runtimeClient: Result<LocalRPCClient, Error>?
     @Environment(\.localLanguageModel) private var language
     @AppStorage("appearanceMode") private var appearanceMode = AppAppearance.system.rawValue
+    @StateObject private var identity: SystemIdentityViewModel
     @StateObject private var connections: AgentConnectionsViewModel
 
     init(container: AppContainer) {
         runtimeClient = container.services.localRuntimeClient
+        _identity = StateObject(wrappedValue: SystemIdentityViewModel(systemInformation: container.services.systemInformation))
         _connections = StateObject(wrappedValue: AgentConnectionsViewModel(
             agentBridge: container.services.agentBridge,
             connections: container.services.mcpConnections
@@ -29,6 +31,7 @@ struct PreferencesView: View {
     /// Внедрение модели позволяет проверять макеты без реальных конфигураций.
     init(connections: AgentConnectionsViewModel) {
         runtimeClient = nil
+        _identity = StateObject(wrappedValue: SystemIdentityViewModel())
         _connections = StateObject(wrappedValue: connections)
     }
 
@@ -37,6 +40,7 @@ struct PreferencesView: View {
 
     var body: some View {
         Form {
+            SystemIdentitySection(model: identity)
             if let language { LocalLanguageSection(model: language) }
             Section(l10n.text(SettingsBlock.appearance.rawValue)) {
                 Picker(l10n.text("Тема"), selection: $appearanceMode) {

@@ -36,16 +36,16 @@ private actor SettingsConnections: MCPConnectionManaging {
 @MainActor
 final class SettingsTests: XCTestCase {
     func testOnlyLocalSectionsRemain() {
-        XCTAssertEqual(AppSection.allCases.map(\.rawValue), ["dashboard", "diagnostics", "storage", "settings"])
-        XCTAssertEqual(AppSection.allCases.map(\.title), ["Обзор", "Диагностика", "Накопитель", "Настройки"])
+        XCTAssertEqual(AppSection.allCases.map(\.rawValue), ["processor", "network", "disk", "memory", "battery", "diagnostics", "settings"])
+        XCTAssertEqual(AppSection.allCases.map(\.title), ["Процессор", "Сеть", "Диск", "Память", "Аккумулятор", "Диагностика", "Настройки"])
     }
 
     func testRemovedSelectionsHaveSafeDestinations() {
         XCTAssertEqual(AppSection.restored(from: "agents"), .settings)
         for previous in ["aiChat", "providers", "unknown"] {
-            XCTAssertEqual(AppSection.restored(from: previous), .dashboard)
+            XCTAssertEqual(AppSection.restored(from: previous), .processor)
         }
-        XCTAssertEqual(AppSection.restored(from: "storage"), .storage)
+        XCTAssertEqual(AppSection.restored(from: "storage"), .disk)
     }
 
     func testSettingsHaveClearBlocks() {

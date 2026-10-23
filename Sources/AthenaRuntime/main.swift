@@ -30,9 +30,9 @@ import EcosystemLocalization
             let service = AthenaRuntimeService(work: work, grants: grants, automation: automation, login: LocalLoginRegistration(profile: file.deletingLastPathComponent(), domain: "athena"), history: history)
             let server = try LocalRPCServer(configuration: config, identifiedHandler: { role, client, request in try await service.handle(role: role, clientID: client, request: request) })
             let scheduler = AdaptiveBackgroundScheduler(tick: { await service.tick() }, delay: { await service.nextBackgroundDelay() })
-            let termination = LocalRuntimeTermination.install { await scheduler.stop(); await work.shutdown() }
+            let termination = LocalRuntimeTermination.install { await service.liveMonitoring.shutdown(); await scheduler.stop(); await work.shutdown() }
             if Bundle.main.bundleURL.pathExtension == "app" { NSApplication.shared.setActivationPolicy(.accessory) }
-            let workspace = LocalWakeObserver { Task { await scheduler.wake() } }
+            let workspace = LocalWakeObserver { Task { await service.liveMonitoring.invalidateBaselines(); await scheduler.wake() } }
             // Relative sleep использует monotonic clock; при смене настенных
             // часов заново считаем due, как и при пробуждении Mac.
             let clock = NotificationCenter.default.addObserver(forName: .NSSystemClockDidChange, object: nil, queue: nil) { _ in

@@ -12,7 +12,7 @@ final class SidebarLayoutTests: XCTestCase {
         XCTAssertEqual(SidebarStyle.iconSize, 20)
         XCTAssertEqual(SidebarStyle.titleSize, 12)
         XCTAssertGreaterThanOrEqual(SidebarStyle.rowHeight, SidebarStyle.iconSize + 12)
-        XCTAssertEqual(AppSection.dashboard.systemImage, "square.grid.2x2")
+        XCTAssertEqual(AppSection.processor.systemImage, "cpu")
         for section in AppSection.allCases {
             XCTAssertNotNil(NSImage(systemSymbolName: section.systemImage, accessibilityDescription: nil))
         }
@@ -27,11 +27,11 @@ final class SidebarLayoutTests: XCTestCase {
     }
 
     func testArrowNavigationPreservesSectionsAndBoundaries() {
-        XCTAssertEqual(SidebarView.destination(from: .dashboard, direction: .down), .diagnostics)
-        XCTAssertEqual(SidebarView.destination(from: .settings, direction: .up), .storage)
-        XCTAssertEqual(SidebarView.destination(from: .dashboard, direction: .up), .dashboard)
+        XCTAssertEqual(SidebarView.destination(from: .processor, direction: .down), .network)
+        XCTAssertEqual(SidebarView.destination(from: .settings, direction: .up), .diagnostics)
+        XCTAssertEqual(SidebarView.destination(from: .processor, direction: .up), .processor)
         XCTAssertEqual(SidebarView.destination(from: .settings, direction: .down), .settings)
-        XCTAssertNil(SidebarView.destination(from: .dashboard, direction: .left))
+        XCTAssertNil(SidebarView.destination(from: .processor, direction: .left))
     }
 
     func testSidebarRendersEverySelectionInBothThemes() async throws {

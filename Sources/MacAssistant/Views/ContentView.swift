@@ -5,12 +5,12 @@ import MacAssistantCore
 /// окну. Бизнес-операции остаются в последующих ViewModel и сервисах.
 struct ContentView: View {
     let container: AppContainer
-    @SceneStorage("selectedSection") private var storedSection = AppSection.dashboard.rawValue
+    @SceneStorage("selectedSection") private var storedSection = AppSection.processor.rawValue
 
     private var selection: Binding<AppSection?> {
         Binding(
             get: { AppSection.restored(from: storedSection) },
-            set: { storedSection = ($0 ?? .dashboard).rawValue }
+            set: { storedSection = ($0 ?? .processor).rawValue }
         )
     }
 
@@ -21,7 +21,7 @@ struct ContentView: View {
                                                 ideal: SidebarStyle.idealWidth,
                                                 max: SidebarStyle.maximumWidth)
         } detail: {
-            DetailRouter(section: selection.wrappedValue ?? .dashboard, container: container)
+            DetailRouter(section: selection.wrappedValue ?? .processor, container: container)
         }
         .navigationSplitViewStyle(.balanced)
     }
@@ -34,12 +34,18 @@ private struct DetailRouter: View {
     @ViewBuilder
     var body: some View {
         switch section {
-        case .dashboard:
-            DashboardView(container: container)
+        case .processor:
+            ProcessorView(container: container)
+        case .network:
+            NetworkView(container: container)
+        case .disk:
+            DiskView(container: container)
+        case .memory:
+            MemoryView(container: container)
+        case .battery:
+            BatteryView(container: container)
         case .diagnostics:
             DiagnosticsView(container: container)
-        case .storage:
-            StorageView(container: container)
         case .settings:
             SettingsOverviewView(container: container)
         }

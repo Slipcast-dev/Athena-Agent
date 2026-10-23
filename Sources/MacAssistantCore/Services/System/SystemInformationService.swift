@@ -114,13 +114,17 @@ public actor SystemInformationService: SystemInformationProviding {
     }
 
     private func readCPUSnapshot() throws -> CPUTimeSnapshot {
+        // mach_host_self создаёт дополнительное send right при каждом вызове.
+        // Для секундного мониторинга балансируем его даже на ошибке Mach API.
+        let host = mach_host_self()
+        defer { mach_port_deallocate(mach_task_self_, host) }
         var cpuLoad = host_cpu_load_info_data_t()
         var count = mach_msg_type_number_t(
             MemoryLayout<host_cpu_load_info_data_t>.size / MemoryLayout<integer_t>.size
         )
         let result = withUnsafeMutablePointer(to: &cpuLoad) { pointer in
             pointer.withMemoryRebound(to: integer_t.self, capacity: Int(count)) {
-                host_statistics(mach_host_self(), HOST_CPU_LOAD_INFO, $0, &count)
+                host_statistics(host, HOST_CPU_LOAD_INFO, $0, &count)
             }
         }
         guard result == KERN_SUCCESS else { throw SystemServiceError.machCallFailed(code: result) }
@@ -134,13 +138,16 @@ public actor SystemInformationService: SystemInformationProviding {
     }
 
     private func readMemoryPageSnapshot() throws -> MemoryPageSnapshot {
+        // VM-статистика получает собственное временное право, независимо от CPU.
+        let host = mach_host_self()
+        defer { mach_port_deallocate(mach_task_self_, host) }
         var statistics = vm_statistics64_data_t()
         var count = mach_msg_type_number_t(
             MemoryLayout<vm_statistics64_data_t>.size / MemoryLayout<integer_t>.size
         )
         let result = withUnsafeMutablePointer(to: &statistics) { pointer in
             pointer.withMemoryRebound(to: integer_t.self, capacity: Int(count)) {
-                host_statistics64(mach_host_self(), HOST_VM_INFO64, $0, &count)
+                host_statistics64(host, HOST_VM_INFO64, $0, &count)
             }
         }
         guard result == KERN_SUCCESS else { throw SystemServiceError.machCallFailed(code: result) }

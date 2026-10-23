@@ -59,7 +59,7 @@ private struct LanguageStorageFixture: StorageAnalyzing {
         await diagnostics.run()
         let originalReport = diagnostics.report
         let storageService = LanguageStorageFixture()
-        let storage = StorageViewModel(storage: storageService)
+        let storage = FolderAnalysisViewModel(storage: storageService)
         storage.startScan(directory: URL(fileURLWithPath: "/fixture/Обзор/LongFolder/LongFolder"))
         for _ in 0..<100 where storage.state == .loading { try await Task.sleep(for: .milliseconds(10)) }
         XCTAssertEqual(storage.items.count, 1)
@@ -77,11 +77,9 @@ private struct LanguageStorageFixture: StorageAnalyzing {
         let connections = AgentConnectionsViewModel(agentBridge: bridge, connections: base.mcpConnections)
         for language in AgentLanguage.allCases {
             for theme in [ColorScheme.light, .dark] {
-                try await render(VStack { SystemIdentityCard(info: info); MetricsGrid(metrics: metrics) }.padding(), name: "dashboard", language: language, theme: theme)
-                try await render(MetricsGrid(metrics: AthenaLocalizationTests.metrics(cpu: nil, state: .warmingUp)).padding(), name: "warming", language: language, theme: theme)
-                try await render(MetricsGrid(metrics: AthenaLocalizationTests.metrics(cpu: nil, state: .unavailable, capturedAt: Date().addingTimeInterval(-300))).padding(), name: "stale", language: language, theme: theme)
+                try await render(Form { Section("Mac") { SystemIdentityRows(info: info) } }.formStyle(.grouped), name: "mac-info", language: language, theme: theme)
                 try await render(DiagnosticsView(viewModel: diagnostics), name: "diagnostics", language: language, theme: theme)
-                try await render(StorageView(viewModel: storage), name: "storage", language: language, theme: theme)
+                try await render(FolderAnalysisView(viewModel: storage), name: "folder-analysis", language: language, theme: theme)
                 try await render(MonitorPanel(model: monitor), name: "monitor", language: language, theme: theme)
                 try await render(MonitorReviewContent(rule: rule, expiresAt: Date().addingTimeInterval(600), error: nil, l10n: AthenaLocalization(language: language)).padding(24).frame(width: 500), name: "approval", language: language, theme: theme)
                 try await render(PreferencesView(connections: connections), name: "preferences", language: language, theme: theme)
