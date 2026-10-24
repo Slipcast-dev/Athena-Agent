@@ -35,7 +35,7 @@ struct MacAssistantMCP {
              "inputSchema": ["type": "object", "properties": [:], "additionalProperties": false]]
         }
         let names = tools.compactMap { $0["name"] as? String }
-        MCPStdioTransport.run(serverName: "mac-assistant", serverVersion: "0.1.5", tools: tools,
+        MCPStdioTransport.run(serverName: "mac-assistant", serverVersion: "0.38.1", tools: tools,
             experimental: ["ecosystemContracts": AthenaEcosystem.experimentalCapability]) { name, data, context in
             do {
                 guard let args = try JSONSerialization.jsonObject(with: data) as? [String: Any] else { throw LocalRuntimeFailure.invalidRequest }

@@ -8,15 +8,18 @@
 
 Athena is an independent local macOS agent. Local Mac diagnostics, storage analysis and monitoring.
 
-Version **0.38.0** · macOS14+ target · current release **Apple Silicon arm64**.
+Version **0.38.1** · macOS14+ target · current release **Apple Silicon arm64**.
 Intel/macOS14 execution remains unverified. This is a source-available project
 under the custom non-commercial [LICENSE](LICENSE), not an MIT-licensed project.
 
 Current sections: CPU, Network, Disk, Memory, Battery, Diagnostics and Settings. Live charts show CPU/per-core load and memory; Disk includes installed applications and their sizes.
 
-[Release 0.38.0](https://github.com/Slipcast-dev/Athena-Agent/releases/tag/v0.38.0) · [PKG](https://github.com/Slipcast-dev/Athena-Agent/releases/download/v0.38.0/Athena-0.38.0-unsigned.pkg) · [DMG](https://github.com/Slipcast-dev/Athena-Agent/releases/download/v0.38.0/Athena-0.38.0-unsigned.dmg) · [SHA-256](https://github.com/Slipcast-dev/Athena-Agent/releases/download/v0.38.0/SHA256SUMS) · [Validation and limits](docs/RELEASE.md)
+[Release 0.38.1](https://github.com/Slipcast-dev/Athena-Agent/releases/tag/v0.38.1) · [PKG](https://github.com/Slipcast-dev/Athena-Agent/releases/download/v0.38.1/Athena-0.38.1-unsigned.pkg) · [DMG](https://github.com/Slipcast-dev/Athena-Agent/releases/download/v0.38.1/Athena-0.38.1-unsigned.dmg) · [SHA-256](https://github.com/Slipcast-dev/Athena-Agent/releases/download/v0.38.1/SHA256SUMS) · [Validation and limits](docs/RELEASE.md)
 
 [Monitoring fields and refresh rates](docs/MONITORING.md).
+
+
+0.38.1 validates serialized MCP model objects and reports failures without crashing. Current instructions are separated from archived release history.
 
 ## Installation
 
@@ -56,15 +59,15 @@ Security reports should follow SECURITY.md; do not post personal data in issues.
 
 ## RU/EN localization / Локализация
 
-Pre-release 0.38.0. Full manual VoiceOver/keyboard and hardware acceptance remain open.
+Pre-release 0.38.1. Full manual VoiceOver/keyboard and hardware acceptance remain open.
 Select System, Русский or English in this agent's settings. Each agent keeps its
 own language. Даты/числа следуют региону macOS. User names, paths and historical
 free text retain their original language. System Settings follows macOS language.
 
 ```sh
 python3 script/verify_localization_acceptance.py --athena-dir . --kit-dir Packages/EcosystemKit --require-reviewed-boundaries --output localization-acceptance.json
-ECOSYSTEM_SKIP_LSREGISTER=1 ECOSYSTEM_APP_VERSION=0.38.0 ./script/build_and_run.sh --package
-python3 script/prepare_local_release.py --run --version 0.38.0 --agent Athena --use-prepared-apps --apps-dir dist --output installers/0.38.0
+ECOSYSTEM_SKIP_LSREGISTER=1 ECOSYSTEM_APP_VERSION=0.38.1 ./script/build_and_run.sh --package
+python3 script/prepare_local_release.py --run --version 0.38.1 --agent Athena --use-prepared-apps --apps-dir dist --output installers/0.38.1
 ```
 
 Installer output is unsigned Developer ID and not notarized. These commands

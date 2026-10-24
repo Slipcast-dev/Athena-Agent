@@ -17,4 +17,4 @@ jobs:
       - run: ./script/build_and_run.sh --package
         env:
           ECOSYSTEM_SKIP_LSREGISTER: '1'
-          ECOSYSTEM_APP_VERSION: '0.38.0'
+          ECOSYSTEM_APP_VERSION: '0.38.1'
